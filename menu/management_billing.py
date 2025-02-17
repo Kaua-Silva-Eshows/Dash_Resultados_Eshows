@@ -1,0 +1,74 @@
+import streamlit as st
+from data.querys_eshows import *
+from menu.page import Page
+from utils.components import *
+from utils.functions import *
+from datetime import date, datetime
+
+def BuildManegementBilling(generalRevenue, groupsCompanies, generalRevenueProposal):
+
+    row1 = st.columns(6)
+    global day_ManegementBilling1, day_ManegementBilling2
+    
+    with row1[2]:
+        day_ManegementBilling1 = st.date_input('Data Inicio:', value=datetime.today().date(), format='DD/MM/YYYY', key='day_ManegementBilling1') 
+    with row1[3]:
+        day_ManegementBilling2 = st.date_input('Data Final:', value=datetime.today().date(), format='DD/MM/YYYY', key='day_ManegementBilling2')
+
+    
+    row2 = st.columns(1)
+
+    with row2[0]:
+        generalRevenue = general_revenue(day_ManegementBilling1, day_ManegementBilling2, filters='')
+        generalRevenue = function_formatted_generalrevenue(generalRevenue)
+        filtered_copy, count = component_plotDataframe(generalRevenue, "Faturamento Eshows Gerencial")
+        function_copy_dataframe_as_tsv(filtered_copy)
+
+    col1, col2 = st.columns(2)
+    with col1:
+        groupsCompanies = groups_companies(day_ManegementBilling1, day_ManegementBilling2)
+        selected_groups = st.multiselect("Selecione um grupo:", groupsCompanies['NOME'].unique(), default=[], placeholder='Grupos')
+
+    filters = ''
+    select_companies = []
+
+    if selected_groups:
+        groupsCompanies_filtered = groupsCompanies[groupsCompanies['NOME'].isin(selected_groups)]
+
+        with col2:
+            select_companies = st.multiselect("Selecione as casas:", groupsCompanies_filtered['NAME'].unique(), placeholder='Casas')
+        if select_companies:
+            groupsCompanies_filtered = groupsCompanies_filtered[groupsCompanies_filtered['NAME'].isin(select_companies)]
+        selected_groups_str = ", ".join(f"'{group}'" for group in selected_groups)
+        filters = f"AND GC.NOME IN ({selected_groups_str})"
+
+        if select_companies:
+            select_companies_str = ", ".join(f"'{company}'" for company in select_companies)
+            filters += f" AND C.NAME IN ({select_companies_str})"
+
+        generalRevenue = general_revenue(day_ManegementBilling1, day_ManegementBilling2, filters)
+        generalRevenue = function_formatted_generalrevenue(generalRevenue)
+        filtered_copy, count = component_plotDataframe(generalRevenue, "Faturamento Detalhado")
+        function_copy_dataframe_as_tsv(filtered_copy)
+
+
+        with st.expander("📊 Abertura por Proposta", expanded=False):
+            generalRevenueProposal = general_revenue_proposal(day_ManegementBilling1, day_ManegementBilling2, filters)
+            filtered_copy, count = component_plotDataframe(generalRevenueProposal, "Abertura por Proposta")
+            function_copy_dataframe_as_tsv(filtered_copy)
+            function_box_lenDf(len_df=count, df=filtered_copy, y='-100', x='500', box_id='box1')
+
+        
+
+class ManegementBilling():
+    def render(self):
+        self.data = {}
+        day_ManegementBilling1 = datetime.today().date()
+        day_ManegementBilling2 = datetime.today().date()
+        self.data['generalRevenue'] = general_revenue(day_ManegementBilling1, day_ManegementBilling2, filters='')
+        self.data['groupsCompanies'] = groups_companies(day_ManegementBilling1, day_ManegementBilling2)
+        self.data['generalRevenueProposal'] = general_revenue_proposal(day_ManegementBilling1, day_ManegementBilling2, filters='')
+
+        BuildManegementBilling(self.data['generalRevenue'],
+                               self.data['groupsCompanies'],
+                               self.data['generalRevenueProposal'])
