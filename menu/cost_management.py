@@ -61,7 +61,7 @@ def BuildCostManagement(generalRevenue, generalCosts, costDetails, ratingsRank, 
             with row3[0]:
                 ratingsRank = ratings_rank(data_ratingsRank)
                 ratingsRankBlueme = ratings_rank_blueme(data_ratingsRank)
-                merged_df1 = pd.merge(ratingsRank,ratingsRankBlueme,on=["Mês/Ano", "CLASSIFICAÇÃO PRIMÁRIA", "VALOR"], how="outer", suffixes=('_ratingsRank', '_ratingsRankBlueme'))
+                merged_df1 = pd.merge(ratingsRank,ratingsRankBlueme,on=["Mês/Ano", "ID CUSTO", "CLASSIFICAÇÃO PRIMÁRIA", "VALOR"], how="outer", suffixes=('_ratingsRank', '_ratingsRankBlueme'))
                 merged_df1 = merged_df1.sort_values(by="VALOR", ascending=False).drop(columns=["Mês/Ano"])
                 merged_df1["VALOR"] = merged_df1["VALOR"].apply(float)
                 plotPizzaChart(merged_df1["CLASSIFICAÇÃO PRIMÁRIA"], merged_df1["VALOR"], None)
@@ -73,7 +73,7 @@ def BuildCostManagement(generalRevenue, generalCosts, costDetails, ratingsRank, 
             with row3[1]:
                 ratingsRank2 = ratings_rank(data_ratingsRank2)
                 ratingsRankBlueme2 = ratings_rank_blueme(data_ratingsRank2)
-                merged_df2 = pd.merge(ratingsRank2,ratingsRankBlueme2,on=["Mês/Ano", "CLASSIFICAÇÃO PRIMÁRIA", "VALOR"], how="outer", suffixes=('_ratingsRank', '_ratingsRankBlueme'))
+                merged_df2 = pd.merge(ratingsRank2,ratingsRankBlueme2,on=["Mês/Ano", "ID CUSTO", "CLASSIFICAÇÃO PRIMÁRIA", "VALOR"], how="outer", suffixes=('_ratingsRank', '_ratingsRankBlueme'))
                 merged_df2 = merged_df2.sort_values(by="VALOR", ascending=False).drop(columns=["Mês/Ano"])
                 merged_df2["VALOR"] = merged_df2["VALOR"].apply(float)
                 plotPizzaChart(merged_df2["CLASSIFICAÇÃO PRIMÁRIA"], merged_df2["VALOR"], None)
@@ -94,6 +94,7 @@ def BuildCostManagement(generalRevenue, generalCosts, costDetails, ratingsRank, 
                 with st.expander("Classificação Detalhada"):
                     ratingsRankDetails = function_format_numeric_columns(merged_df3)
                     filtered_copy, count= component_plotDataframe(ratingsRankDetails, f"Classificação Detalhada {data_ratingsRank}")
+                    function_copy_dataframe_as_tsv(filtered_copy)
 
 
         with row4[2]:
@@ -105,6 +106,7 @@ def BuildCostManagement(generalRevenue, generalCosts, costDetails, ratingsRank, 
                 with st.expander("Classificação Detalhada"):
                     ratingsRankDetails2 = function_format_numeric_columns(merged_df4)
                     filtered_copy, count= component_plotDataframe(ratingsRankDetails2, f"Classificação Detalhada {data_ratingsRank2}")
+                    function_copy_dataframe_as_tsv(filtered_copy)
 
 
 
