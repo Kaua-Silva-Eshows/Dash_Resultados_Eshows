@@ -56,7 +56,7 @@ def BuildManegementBilling(generalRevenue, groupsCompanies, generalRevenuePropos
             generalRevenueProposal = general_revenue_proposal(day_ManegementBilling1, day_ManegementBilling2, filters)
             filtered_copy, count = component_plotDataframe(generalRevenueProposal, "Abertura por Proposta")
             function_copy_dataframe_as_tsv(filtered_copy)
-            function_box_lenDf(len_df=count, df=filtered_copy, y='-100', x='500', box_id='box1')
+            function_box_lenDf(len_df=count, df=filtered_copy, y='-100', x='500', box_id='box1', item='Propostas')
 
         
 

@@ -1,6 +1,7 @@
 from data.dbconnect import get_dataframe_from_query
 import streamlit as st
 
+@st.cache_data
 def general_costs_blueme(day1, day2):
     return get_dataframe_from_query(f"""
 SELECT 
@@ -27,6 +28,7 @@ GROUP BY YEAR(DR.COMPETENCIA), MONTH(DR.COMPETENCIA)
 ORDER BY STR_TO_DATE(DATE_FORMAT(DR.COMPETENCIA, '%m/%Y'), '%m/%Y');
 """, use_blueme=True)
 
+@st.cache_data
 def costs_blueme_details(day1, day2):
     return get_dataframe_from_query(f"""
 SELECT
@@ -55,6 +57,7 @@ GROUP BY YEAR(DR.COMPETENCIA), MONTH(DR.COMPETENCIA), `CATEGORIA DE CUSTO`
 ORDER BY `CATEGORIA DE CUSTO`
 """, use_blueme=True)
 
+@st.cache_data
 def ratings_rank_blueme(day):
     return get_dataframe_from_query(f"""
 SELECT 
@@ -71,16 +74,21 @@ AND DR.COMPETENCIA LIKE '{day}%'
 GROUP BY G1.DESCRICAO, YEAR(DR.COMPETENCIA), MONTH(DR.COMPETENCIA)
 """, use_blueme=True)
 
+@st.cache_data
 def ratings_rank_details_blueme(data):
    return get_dataframe_from_query(f"""
 SELECT 
-    G1.ID AS 'ID CUSTO',
+		DR.ID AS 'ID CUSTO',
     G1.DESCRICAO AS 'CLASSIFICAÇÃO PRIMÁRIA',
     G2.DESCRICAO AS 'DESCRIÇÃO DA DESPESA',
-    DR.VALOR_LIQUIDO AS 'VALOR'
+    DR.VALOR_LIQUIDO AS 'VALOR',
+    F.FANTASY_NAME AS 'FORNECEDOR',
+		DATE_FORMAT(DR.LANCAMENTO, '%d/%m/%Y')AS 'DATA LANÇAMENTO',    
+    DATE_FORMAT(DR.COMPETENCIA, '%d/%m/%Y') AS 'DATA COMPETÊNCIA'
 FROM T_CLASSIFICACAO_CONTABIL_GRUPO_1 G1
 LEFT JOIN T_CLASSIFICACAO_CONTABIL_GRUPO_2 G2 ON G2.FK_GRUPO_1 = G1.ID
 LEFT JOIN T_DESPESA_RAPIDA DR ON DR.FK_CLASSIFICACAO_CONTABIL_GRUPO_2 = G2.ID
+LEFT JOIN T_FORNECEDOR F ON F.ID = DR.FK_FORNECEDOR
 LEFT JOIN (
     -- Subquery para calcular o total de valor por CLASSIFICAÇÃO PRIMÁRIA
     SELECT 

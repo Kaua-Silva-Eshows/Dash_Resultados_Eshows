@@ -93,8 +93,13 @@ def BuildCostManagement(generalRevenue, generalCosts, costDetails, ratingsRank, 
                 
                 with st.expander("Classificação Detalhada"):
                     ratingsRankDetails = function_format_numeric_columns(merged_df3)
+                    ratingsRankDetails['ID CUSTO'] = ratingsRankDetails['ID CUSTO'].str.replace(',00', '', regex=False)
+                    if merged_df3["FORNECEDOR"].str.contains("nan", case=False, na=False).any():
+                        merged_df3["FORNECEDOR"] = ""
                     filtered_copy, count= component_plotDataframe(ratingsRankDetails, f"Classificação Detalhada {data_ratingsRank}")
                     function_copy_dataframe_as_tsv(filtered_copy)
+                    function_box_lenDf(len_df=count, df=filtered_copy, y='-130', x='300', box_id='box1', item='Insumos')
+
 
 
         with row4[2]:
@@ -105,8 +110,13 @@ def BuildCostManagement(generalRevenue, generalCosts, costDetails, ratingsRank, 
 
                 with st.expander("Classificação Detalhada"):
                     ratingsRankDetails2 = function_format_numeric_columns(merged_df4)
+                    ratingsRankDetails2['ID CUSTO'] = ratingsRankDetails2['ID CUSTO'].str.replace(',00', '', regex=False)
+                    if merged_df3["FORNECEDOR"].str.contains("nan", case=False, na=False).any():
+                        merged_df3["FORNECEDOR"] = ""
                     filtered_copy, count= component_plotDataframe(ratingsRankDetails2, f"Classificação Detalhada {data_ratingsRank2}")
                     function_copy_dataframe_as_tsv(filtered_copy)
+                    function_box_lenDf(len_df=count, df=filtered_copy, y='-130', x='300', box_id='box1', item='Insumos')
+
 
 
 

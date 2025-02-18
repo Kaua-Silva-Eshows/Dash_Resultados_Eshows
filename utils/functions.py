@@ -39,7 +39,7 @@ def function_copy_dataframe_as_tsv(df):
     )
 
 
-def function_box_lenDf(len_df,df,y='', x='', box_id=''):
+def function_box_lenDf(len_df,df,y='', x='', box_id='', item=''):
     len_df = len(df)
     st.markdown(
         """
@@ -72,7 +72,7 @@ def function_box_lenDf(len_df,df,y='', x='', box_id=''):
         }}
         </style>
         <div id="{box_id}" class="small-box">
-            O DataFrame contém <span style="color: #ffb131;">{len_df}</span> Propostas.
+            O DataFrame contém <span style="color: #ffb131;">{len_df}</span> {item}.
         </div>
         """,
         unsafe_allow_html=True
