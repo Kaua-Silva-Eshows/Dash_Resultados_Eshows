@@ -86,7 +86,7 @@ def component_plotDataframe(df, name, apply_progress_bar=False):
     return filtered_df, len(filtered_df)
 
 
-def plotPizzaChart(labels, sizes, name, max_columns=8):
+def component_plotPizzaChart(labels, sizes, name, max_columns=8):
     chart_key = f"{labels}_{sizes}_{name}_"
     if name:
         st.markdown(f"<h5 style='text-align: center; background-color: #ffb131; padding: 0.1em;'>{name}</h5>", unsafe_allow_html=True)

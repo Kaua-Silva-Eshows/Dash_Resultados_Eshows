@@ -7,20 +7,21 @@ def general_costs_blueme(day1, day2):
 SELECT 
     DATE_FORMAT(DR.COMPETENCIA, '%m/%Y') AS 'Mês/Ano',
     
-    SUM(CASE WHEN G1.DESCRICAO IN ('Impostos e Taxas') THEN DR.VALOR_LIQUIDO ELSE 0 END) AS 'C1 Impostos',
-    SUM(CASE WHEN G1.DESCRICAO IN ('Eventos','Locação de Equipamentos Eventos','Locações','Manutenção','Ocupação','Utilidades', 'Insumos - A&B', 'Ocupação - Eventos') THEN DR.VALOR_LIQUIDO ELSE 0 END) AS 'C2 Custos de Ocupação',
-    SUM(CASE WHEN G1.DESCRICAO IN ('Mão de obra','Transporte') THEN DR.VALOR_LIQUIDO ELSE 0 END) AS 'C3 Despesas com Pessoal Interno',
-    SUM(CASE WHEN G1.DESCRICAO IN ('Serviço de Terceiros', 'Adiantamento a Fornecedores') THEN DR.VALOR_LIQUIDO ELSE 0 END) AS 'C4 Despesas com Pessoal Terceirizado',
-    SUM(CASE WHEN G1.DESCRICAO IN ('Problemas Operacionais') THEN DR.VALOR_LIQUIDO ELSE 0 END) AS 'C5 Despesas Operacionais com Shows',
-    SUM(CASE WHEN G1.DESCRICAO IN ('Visitas a Clientes') THEN DR.VALOR_LIQUIDO ELSE 0 END) AS 'C6 Despesas com Clientes',
-    SUM(CASE WHEN G1.DESCRICAO IN ('Informática e TI') THEN DR.VALOR_LIQUIDO ELSE 0 END) AS 'C7 Despesas com Softwares e Licenças',
-    SUM(CASE WHEN G1.DESCRICAO IN ('Artístico', 'Marketing', 'Patrocínio') THEN DR.VALOR_LIQUIDO ELSE 0 END) AS 'C8 Despesas com Marketing',
-    SUM(CASE WHEN G1.DESCRICAO IN ('Despesas Financeiras', 'Receitas Financeiras', 'Receita Bruta', 'Deduções sobre Receita', 'Endividamento', 'Investimento - Capex') THEN DR.VALOR_LIQUIDO ELSE 0 END) AS 'C9 Despesas Financeiras'
+    SUM(CASE WHEN G1.ID IN ('216') THEN DR.VALOR_LIQUIDO ELSE 0 END) AS 'C1 Impostos',
+    SUM(CASE WHEN G1.ID IN ('215','220','221','222','225','232', '218', '226') THEN DR.VALOR_LIQUIDO ELSE 0 END) AS 'C2 Custos de Ocupação',
+    SUM(CASE WHEN G1.ID IN ('223','231') THEN DR.VALOR_LIQUIDO ELSE 0 END) AS 'C3 Despesas com Pessoal Interno',
+    SUM(CASE WHEN G1.ID IN ('230', '210') THEN DR.VALOR_LIQUIDO ELSE 0 END) AS 'C4 Despesas com Pessoal Terceirizado',
+    SUM(CASE WHEN G1.ID IN ('234') THEN DR.VALOR_LIQUIDO ELSE 0 END) AS 'C5 Despesas Operacionais com Shows',
+    SUM(CASE WHEN G1.ID IN ('233') THEN DR.VALOR_LIQUIDO ELSE 0 END) AS 'C6 Despesas com Clientes',
+    SUM(CASE WHEN G1.ID IN ('217') THEN DR.VALOR_LIQUIDO ELSE 0 END) AS 'C7 Despesas com Softwares e Licenças',
+    SUM(CASE WHEN G1.ID IN ('211', '224', '227') THEN DR.VALOR_LIQUIDO ELSE 0 END) AS 'C8 Despesas com Marketing',
+    SUM(CASE WHEN G1.ID IN ('213', '229', '228', '212', '214', '219') THEN DR.VALOR_LIQUIDO ELSE 0 END) AS 'C9 Despesas Financeiras'
     
-FROM T_CLASSIFICACAO_CONTABIL_GRUPO_1 G1
+FROM T_DESPESA_RAPIDA DR
+LEFT JOIN T_CLASSIFICACAO_CONTABIL_GRUPO_1 G1 ON DR.FK_CLASSIFICACAO_CONTABIL_GRUPO_1 = G1.ID
 LEFT JOIN T_VERSOES_PLANO_CONTABIL VPC ON VPC.ID = G1.FK_VERSAO_PLANO_CONTABIL
-LEFT JOIN T_DESPESA_RAPIDA DR ON DR.FK_CLASSIFICACAO_CONTABIL_GRUPO_1 = G1.ID
-WHERE G1.FK_VERSAO_PLANO_CONTABIL = '102'
+WHERE DR.FK_LOJA = '133'
+AND G1.FK_VERSAO_PLANO_CONTABIL = '102'
 AND DR.COMPETENCIA >= '2025-01-01'
 AND DR.COMPETENCIA >= '{day1}'
 AND DR.COMPETENCIA <= '{day2}'
@@ -33,23 +34,24 @@ def costs_blueme_details(day1, day2):
     return get_dataframe_from_query(f"""
 SELECT
     CASE 
-        WHEN G1.DESCRICAO IN ('Impostos e Taxas') THEN 'c1_Impostos'
-        WHEN G1.DESCRICAO IN ('Eventos','Locação de Equipamentos Eventos','Locações','Manutenção','Ocupação','Utilidades', 'Insumos - A&B', 'Ocupação - Eventos') THEN 'c2_Custos_de_Ocupacao'
-        WHEN G1.DESCRICAO IN ('Mão de obra','Transporte') THEN 'c3_Despesas_com_Pessoal_Interno'
-        WHEN G1.DESCRICAO IN ('Serviço de Terceiros', 'Adiantamento a Fornecedores') THEN 'c4_Despesas_com_Pessoal_Terceirizado'
-        WHEN G1.DESCRICAO IN ('Problemas Operacionais') THEN 'c5_Problemas_Operacionais'
-        WHEN G1.DESCRICAO IN ('Visitas a Clientes') THEN 'c6_Despesas_com_Clientes'
-        WHEN G1.DESCRICAO IN ('Informática e TI') THEN 'c7_Despesas_com_Softwares_e_Licencas'
-        WHEN G1.DESCRICAO IN ('Artístico', 'Marketing', 'Patrocínio') THEN 'c8_Despesas_com_Marketing'
-        WHEN G1.DESCRICAO IN ('Despesas Financeiras', 'Receitas Financeiras', 'Receita Bruta', 'Deduções sobre Receita', 'Endividamento', 'Investimento - Capex') THEN 'c9_Despesas_Financeiras'
+        WHEN G1.ID IN ('216') THEN 'c1_Impostos'
+        WHEN G1.ID IN ('215','220','221','222','225','232', '218', '226') THEN 'c2_Custos_de_Ocupacao'
+        WHEN G1.ID IN ('223','231') THEN 'c3_Despesas_com_Pessoal_Interno'
+        WHEN G1.ID IN ('230', '210') THEN 'c4_Despesas_com_Pessoal_Terceirizado'
+        WHEN G1.ID IN ('234') THEN 'c5_Problemas_Operacionais'
+        WHEN G1.ID IN ('233') THEN 'c6_Despesas_com_Clientes'
+        WHEN G1.ID IN ('217') THEN 'c7_Despesas_com_Softwares_e_Licencas'
+        WHEN G1.ID IN ('211', '224', '227') THEN 'c8_Despesas_com_Marketing'
+        WHEN G1.ID IN ('213', '229', '228', '212', '214', '219') THEN 'c9_Despesas_Financeiras'
     END AS `CATEGORIA DE CUSTO`,
     G1.DESCRICAO AS 'CLASSIFICAÇÃO PRIMÁRIA',
     SUM(DR.VALOR_LIQUIDO) AS 'VALOR',
     DATE_FORMAT(DR.COMPETENCIA, '%Y/%m') AS 'DATA'
-FROM T_CLASSIFICACAO_CONTABIL_GRUPO_1 G1
+FROM T_DESPESA_RAPIDA DR
+LEFT JOIN T_CLASSIFICACAO_CONTABIL_GRUPO_1 G1 ON DR.FK_CLASSIFICACAO_CONTABIL_GRUPO_1 = G1.ID
 LEFT JOIN T_VERSOES_PLANO_CONTABIL VPC ON VPC.ID = G1.FK_VERSAO_PLANO_CONTABIL
-LEFT JOIN T_DESPESA_RAPIDA DR ON DR.FK_CLASSIFICACAO_CONTABIL_GRUPO_1 = G1.ID
-WHERE G1.FK_VERSAO_PLANO_CONTABIL = '102'
+WHERE DR.FK_LOJA = '133'
+AND G1.FK_VERSAO_PLANO_CONTABIL = '102'                                    
 AND DR.COMPETENCIA >= '2025-01-01'
 AND DR.COMPETENCIA >= '{day1}'
 AND DR.COMPETENCIA <= '{day2}'
@@ -65,10 +67,11 @@ SELECT
     G1.ID AS 'ID CUSTO',
     G1.DESCRICAO AS 'CLASSIFICAÇÃO PRIMÁRIA',
     SUM(DR.VALOR_LIQUIDO) AS 'VALOR'
-FROM T_CLASSIFICACAO_CONTABIL_GRUPO_1 G1
+FROM T_DESPESA_RAPIDA DR
+LEFT JOIN T_CLASSIFICACAO_CONTABIL_GRUPO_1 G1 ON DR.FK_CLASSIFICACAO_CONTABIL_GRUPO_1 = G1.ID
 LEFT JOIN T_VERSOES_PLANO_CONTABIL VPC ON VPC.ID = G1.FK_VERSAO_PLANO_CONTABIL
-LEFT JOIN T_DESPESA_RAPIDA DR ON DR.FK_CLASSIFICACAO_CONTABIL_GRUPO_1 = G1.ID
-WHERE G1.FK_VERSAO_PLANO_CONTABIL = '102'
+WHERE DR.FK_LOJA = '133'
+AND G1.FK_VERSAO_PLANO_CONTABIL = '102'                                    
 AND DR.COMPETENCIA >= '2025-01-01'
 AND DR.COMPETENCIA LIKE '{day}%'
 GROUP BY G1.DESCRICAO, YEAR(DR.COMPETENCIA), MONTH(DR.COMPETENCIA)
@@ -79,29 +82,46 @@ def ratings_rank_details_blueme(data):
    return get_dataframe_from_query(f"""
 SELECT 
 		DR.ID AS 'ID CUSTO',
-    G1.DESCRICAO AS 'CLASSIFICAÇÃO PRIMÁRIA',
-    G2.DESCRICAO AS 'DESCRIÇÃO DA DESPESA',
+    CASE 
+        WHEN G1.ID IN ('216') THEN 'c1_Impostos'
+        WHEN G1.ID IN ('215','220','221','222','225','232', '218', '226') THEN 'c2_Custos_de_Ocupacao'
+        WHEN G1.ID IN ('223','231') THEN 'c3_Despesas_com_Pessoal_Interno'
+        WHEN G1.ID IN ('230', '210') THEN 'c4_Despesas_com_Pessoal_Terceirizado'
+        WHEN G1.ID IN ('234') THEN 'c5_Problemas_Operacionais'
+        WHEN G1.ID IN ('233') THEN 'c6_Despesas_com_Clientes'
+        WHEN G1.ID IN ('217') THEN 'c7_Despesas_com_Softwares_e_Licencas'
+        WHEN G1.ID IN ('211', '224', '227') THEN 'c8_Despesas_com_Marketing'
+        WHEN G1.ID IN ('213', '229', '228', '212', '214', '219') THEN 'c9_Despesas_Financeiras'
+    END AS `GRUPO GERAL`,
+    G1.DESCRICAO AS 'NIVEL 1',
+    G2.DESCRICAO AS 'NIVEL 2',
     DR.VALOR_LIQUIDO AS 'VALOR',
-    F.FANTASY_NAME AS 'FORNECEDOR',
-    DATE_FORMAT(DR.COMPETENCIA, '%d/%m/%Y') AS 'DATA COMPETÊNCIA'
-FROM T_CLASSIFICACAO_CONTABIL_GRUPO_1 G1
-LEFT JOIN T_CLASSIFICACAO_CONTABIL_GRUPO_2 G2 ON G2.FK_GRUPO_1 = G1.ID
-LEFT JOIN T_DESPESA_RAPIDA DR ON DR.FK_CLASSIFICACAO_CONTABIL_GRUPO_2 = G2.ID
+    SP.DESCRICAO AS 'PAGAMENTO',
+    DATE_FORMAT(DR.COMPETENCIA, '%d/%m/%Y') AS 'DATA COMPETÊNCIA',
+    DATE_FORMAT(DR.VENCIMENTO, '%d/%m/%Y') AS 'DATA VENCIMENTO',
+    F.FANTASY_NAME AS 'FORNECEDOR'
+FROM T_DESPESA_RAPIDA DR 
+LEFT JOIN T_CLASSIFICACAO_CONTABIL_GRUPO_2 G2 ON G2.ID = DR.FK_CLASSIFICACAO_CONTABIL_GRUPO_2
+LEFT JOIN T_CLASSIFICACAO_CONTABIL_GRUPO_1 G1 ON G1.ID = G2.FK_GRUPO_1
 LEFT JOIN T_FORNECEDOR F ON F.ID = DR.FK_FORNECEDOR
+LEFT JOIN T_STATUS_PAGAMENTO SP ON SP.ID = DR.FK_STATUS_PGTO
 LEFT JOIN (
     -- Subquery para calcular o total de valor por CLASSIFICAÇÃO PRIMÁRIA
     SELECT 
         G1.ID AS Grupo1_ID,
         SUM(DR.VALOR_LIQUIDO) AS Total_Valor
-    FROM T_CLASSIFICACAO_CONTABIL_GRUPO_1 G1
-    LEFT JOIN T_CLASSIFICACAO_CONTABIL_GRUPO_2 G2 ON G2.FK_GRUPO_1 = G1.ID
-    LEFT JOIN T_DESPESA_RAPIDA DR ON DR.FK_CLASSIFICACAO_CONTABIL_GRUPO_2 = G2.ID
-    WHERE G1.FK_VERSAO_PLANO_CONTABIL = '102'
+    FROM T_DESPESA_RAPIDA DR 
+  	LEFT JOIN T_CLASSIFICACAO_CONTABIL_GRUPO_2 G2 ON G2.ID = DR.FK_CLASSIFICACAO_CONTABIL_GRUPO_2
+  	LEFT JOIN T_CLASSIFICACAO_CONTABIL_GRUPO_1 G1 ON G1.ID = G2.FK_GRUPO_1
+    
+    WHERE DR.FK_LOJA = '133'
+    AND G1.FK_VERSAO_PLANO_CONTABIL = '102'                                   
     AND DR.COMPETENCIA >= '2025-01-01'
     AND DR.COMPETENCIA LIKE '{data}%'
     GROUP BY G1.ID
 ) AS Total_Custos ON G1.ID = Total_Custos.Grupo1_ID
-WHERE G1.FK_VERSAO_PLANO_CONTABIL = '102'
+WHERE DR.FK_LOJA = '133'
+AND G1.FK_VERSAO_PLANO_CONTABIL = '102'
 AND DR.COMPETENCIA >= '2025-01-01'
 AND DR.COMPETENCIA LIKE '{data}%'
 ORDER BY Total_Custos.Total_Valor DESC, DR.VALOR_LIQUIDO DESC;
