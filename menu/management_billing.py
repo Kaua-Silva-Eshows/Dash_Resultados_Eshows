@@ -11,7 +11,7 @@ def BuildManegementBilling(generalRevenue, groupsCompanies, generalRevenuePropos
     global day_ManegementBilling1, day_ManegementBilling2
     
     with row1[2]:
-        day_ManegementBilling1 = st.date_input('Data Inicio:', value=datetime.today().date(), format='DD/MM/YYYY', key='day_ManegementBilling1') 
+        day_ManegementBilling1 = st.date_input('Data Inicio:', value=datetime(2024, 1, 1).date(), format='DD/MM/YYYY', key='day_ManegementBilling1') 
     with row1[3]:
         day_ManegementBilling2 = st.date_input('Data Final:', value=datetime.today().date(), format='DD/MM/YYYY', key='day_ManegementBilling2')
 

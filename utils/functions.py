@@ -221,7 +221,7 @@ def function_marged_pivot_costDetails(df1, df2):
     row = pd.Series()
     for col in pivot_df.columns:
         if col != 'CATEGORIA DE CUSTO' and col != 'CLASSIFICAÇÃO PRIMÁRIA':  
-            row[col] = pivot_df[col].sum()
+            row[col] = pivot_df.loc[~pivot_df['CLASSIFICAÇÃO PRIMÁRIA'].str.contains("📊 Total Categoria", na=False), col].sum()
 
     row['CATEGORIA DE CUSTO'] = '💰 Custo Geral'
     pivot_df = pd.concat([pivot_df, row.to_frame().T]).reset_index(drop=True)
@@ -246,3 +246,24 @@ def function_merged_and_add_df(df1, df2, column):
     merged_df[f'{column}'] = pd.to_datetime(merged_df[f'{column}'], format="%m/%Y").dt.strftime("%m/%Y")
 
     return merged_df
+
+
+def function_total_line(df, column_value, column_total):
+    
+    df[column_value] = pd.to_numeric(df[column_value], errors='coerce')
+    total_value = df[f'{column_value}'].sum()
+    new_row = {
+        f"{column_total}": "Total:", 
+        f'{column_value}': total_value
+    }
+
+    for col in df.columns:
+        if col not in [f"{column_total}", f'{column_value}']:
+            new_row[col] = ""
+
+    new_row_df = pd.DataFrame([new_row])
+    df = pd.concat([df, new_row_df], ignore_index=True)
+    df = function_format_numeric_columns(df)
+
+
+    return df

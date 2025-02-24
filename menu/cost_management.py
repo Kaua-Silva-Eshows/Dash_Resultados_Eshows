@@ -62,23 +62,30 @@ def BuildCostManagement(generalRevenue, generalCosts, costDetails, ratingsRank, 
             with row3[0]:
                 ratingsRank = ratings_rank(data_ratingsRank)
                 ratingsRankBlueme = ratings_rank_blueme(data_ratingsRank)
-                merged_df1 = pd.merge(ratingsRank,ratingsRankBlueme,on=["Mês/Ano", "ID CUSTO", "CLASSIFICAÇÃO PRIMÁRIA", "VALOR"], how="outer", suffixes=('_ratingsRank', '_ratingsRankBlueme'))
+                merged_df1 = pd.merge(ratingsRank,ratingsRankBlueme,on=["Mês/Ano", "CLASSIFICAÇÃO PRIMÁRIA", "VALOR"], how="outer", suffixes=('_ratingsRank', '_ratingsRankBlueme'))
                 merged_df1 = merged_df1.sort_values(by="VALOR", ascending=False).drop(columns=["Mês/Ano"])
                 merged_df1["VALOR"] = merged_df1["VALOR"].apply(float)
                 component_plotPizzaChart(merged_df1["CLASSIFICAÇÃO PRIMÁRIA"], merged_df1["VALOR"], None)
-                merged_df1 = function_format_numeric_columns(merged_df1)
+
+                merged_df1 = function_total_line(merged_df1, 'VALOR', 'CLASSIFICAÇÃO PRIMÁRIA') 
+
                 filtered_copy, count= component_plotDataframe(merged_df1, f"Custos {data_ratingsRank}")
+
                 function_copy_dataframe_as_tsv(filtered_copy)
                 
         if data_ratingsRank2:
             with row3[1]:
                 ratingsRank2 = ratings_rank(data_ratingsRank2)
                 ratingsRankBlueme2 = ratings_rank_blueme(data_ratingsRank2)
-                merged_df2 = pd.merge(ratingsRank2,ratingsRankBlueme2,on=["Mês/Ano", "ID CUSTO", "CLASSIFICAÇÃO PRIMÁRIA", "VALOR"], how="outer", suffixes=('_ratingsRank', '_ratingsRankBlueme'))
+                merged_df2 = pd.merge(ratingsRank2,ratingsRankBlueme2,on=["Mês/Ano", "CLASSIFICAÇÃO PRIMÁRIA", "VALOR"], how="outer", suffixes=('_ratingsRank', '_ratingsRankBlueme'))
                 merged_df2 = merged_df2.sort_values(by="VALOR", ascending=False).drop(columns=["Mês/Ano"])
                 merged_df2["VALOR"] = merged_df2["VALOR"].apply(float)
+
                 component_plotPizzaChart(merged_df2["CLASSIFICAÇÃO PRIMÁRIA"], merged_df2["VALOR"], None)
-                merged_df2 = function_format_numeric_columns(merged_df2)
+
+                merged_df2 = function_total_line(merged_df2, 'VALOR', 'CLASSIFICAÇÃO PRIMÁRIA')
+
+
                 filtered_copy, count= component_plotDataframe(merged_df2, f"Custos {data_ratingsRank2}")
                 function_copy_dataframe_as_tsv(filtered_copy)
 
@@ -92,17 +99,19 @@ def BuildCostManagement(generalRevenue, generalCosts, costDetails, ratingsRank, 
                 ratingsRankDetailsBlueme = ratings_rank_details_blueme(data_ratingsRank)
                 merged_df3 = pd.concat([ratingsRankDetails, ratingsRankDetailsBlueme], ignore_index=True)
                 
-                with st.expander("Classificação Detalhada"):
-                    ratingsRankDetails = function_format_numeric_columns(merged_df3)
-                    ratingsRankDetails['ID CUSTO'] = ratingsRankDetails['ID CUSTO'].str.replace(',00', '', regex=False)
-                    if merged_df3["FORNECEDOR"].str.contains("nan", case=False, na=False).any():
-                        merged_df3["FORNECEDOR"] = ""
-
+                with st.expander("Classificação Detalhada"):                    
+                    
+                    merged_df3 = function_total_line(merged_df3, 'VALOR', 'GRUPO GERAL')
+                    merged_df3["FORNECEDOR"] = merged_df3["FORNECEDOR"].replace("nan", "", regex=False)
+                    merged_df3['ID CUSTO'] = (merged_df3['ID CUSTO'].str.replace(",00", "", regex=False).str.replace("nan", "", regex=False).str.replace(".", "", regex=False))
+ 
+                    
                     row1 = st.columns(3)
                     tile = row1[1].container(border=True)
-                    num_line_merged_df3_payment = len(merged_df3[merged_df3['PAGAMENTO'] == 'Pendente'])
-                    tile.write(f"<p style='text-align: center;'> Pagamentos Pendentes </br>{ num_line_merged_df3_payment }</p>", unsafe_allow_html=True)
-                    filtered_copy, count= component_plotDataframe(ratingsRankDetails, f"Classificação Detalhada {data_ratingsRank}")
+                    ratingsRankDetails_pay_pending = len(merged_df3[merged_df3['PAGAMENTO'] == 'Pendente'])
+                    tile.write(f"<p style='text-align: center;'> Pagamentos Pendentes </br>{ ratingsRankDetails_pay_pending }</p>", unsafe_allow_html=True)
+                    
+                    filtered_copy, count= component_plotDataframe(merged_df3, f"Classificação Detalhada {data_ratingsRank}")
                     function_copy_dataframe_as_tsv(filtered_copy)
                     function_box_lenDf(len_df=count, df=filtered_copy, y='-130', x='300', box_id='box1', item='Insumos')
 
@@ -115,16 +124,18 @@ def BuildCostManagement(generalRevenue, generalCosts, costDetails, ratingsRank, 
                 merged_df4 = pd.concat([ratingsRankDetails2, ratingsRankDetailsBlueme2], ignore_index=True)
 
                 with st.expander("Classificação Detalhada"):
-                    ratingsRankDetails2 = function_format_numeric_columns(merged_df4)
-                    ratingsRankDetails2['ID CUSTO'] = ratingsRankDetails2['ID CUSTO'].str.replace(',00', '', regex=False)
-                    if merged_df4["FORNECEDOR"].str.contains("nan", case=False, na=False).any():
-                        merged_df4["FORNECEDOR"] = ""
+
+
+                    merged_df4 = function_total_line(merged_df4, 'VALOR', 'GRUPO GERAL')
+                    merged_df4["FORNECEDOR"] = merged_df4["FORNECEDOR"].replace("nan", "", regex=False)
+                    merged_df4['ID CUSTO'] = (merged_df4['ID CUSTO'].str.replace(",00", "", regex=False).str.replace("nan", "", regex=False).str.replace(".", "", regex=False))
+
 
                     row1 = st.columns(3)
                     tile = row1[1].container(border=True)
-                    num_line_merged_df4_payment = len(merged_df4[merged_df4['PAGAMENTO'] == 'Pendente'])
-                    tile.write(f"<p style='text-align: center;'> Pagamentos Pendentes </br>{ num_line_merged_df4_payment }</p>", unsafe_allow_html=True)
-                    filtered_copy, count= component_plotDataframe(ratingsRankDetails2, f"Classificação Detalhada {data_ratingsRank2}")
+                    ratingsRankDetails2_pay_pending = len(merged_df4[merged_df4['PAGAMENTO'] == 'Pendente'])
+                    tile.write(f"<p style='text-align: center;'> Pagamentos Pendentes </br>{ ratingsRankDetails2_pay_pending }</p>", unsafe_allow_html=True)
+                    filtered_copy, count= component_plotDataframe(merged_df4, f"Classificação Detalhada {data_ratingsRank2}")
                     function_copy_dataframe_as_tsv(filtered_copy)
                     function_box_lenDf(len_df=count, df=filtered_copy, y='-130', x='300', box_id='box1', item='Insumos')
 

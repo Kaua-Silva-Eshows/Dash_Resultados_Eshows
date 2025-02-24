@@ -76,8 +76,10 @@ def component_plotDataframe(df, name, apply_progress_bar=False):
         gridOptions=grid_options,
         enable_enterprise_modules=True,
         update_mode=GridUpdateMode.MODEL_CHANGED,
-        fit_columns_on_grid_load=True  # Ajusta as colunas automaticamente ao carregar
-        
+        fit_columns_on_grid_load=True,  # Ajusta as colunas automaticamente ao carregar
+        key=f"aggrid_{name}"
+
+
     )
 
     # Recupera o DataFrame filtrado

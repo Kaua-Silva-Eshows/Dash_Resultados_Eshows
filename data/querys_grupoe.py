@@ -41,7 +41,6 @@ def ratings_rank(data):
     return get_dataframe_from_query(f"""
 SELECT
 DATE_FORMAT(CEC.Data_Vencimento, '%m/%Y') AS 'Mês/Ano',
-CEC.ID_Classificacao_Primaria AS 'ID CUSTO',
 CEC.Classificacao_Primaria AS 'CLASSIFICAÇÃO PRIMÁRIA', 
 SUM(CEC.Valor) AS 'VALOR'
 

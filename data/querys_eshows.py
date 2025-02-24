@@ -34,7 +34,7 @@ def general_revenue(day1, day2, filters):
     LEFT JOIN T_KEYACCOUNT_ESTABELECIMENTO KE ON C.FK_KEYACCOUNT = KE.ID
     LEFT JOIN T_OPERADORES OP ON C.FK_OPERADOR = OP.ID
     WHERE FE.Data >= '{day1}'
-    AND FE.Data <= '{day2}'
+    AND FE.Data <= DATE_ADD('{day2}', INTERVAL 1 DAY)
     {filters}  -- Aqui o filtro é adicionado dinamicamente
     GROUP BY DATE_FORMAT(FE.Data, '%m/%Y')
     ORDER BY STR_TO_DATE(DATE_FORMAT(FE.Data, '%m/%Y'), '%m/%Y') ASC
