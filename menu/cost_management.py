@@ -7,6 +7,9 @@ from menu.page import Page
 from utils.components import *
 from utils.functions import *
 from datetime import date, datetime
+from st_aggrid import AgGrid, GridOptionsBuilder
+from st_aggrid.shared import JsCode
+from st_aggrid import GridUpdateMode
 
 def BuildCostManagement(generalRevenue, generalCosts, costDetails, ratingsRank, ratingsRankDetails, generalCostsBlueme, costsBluemeDetails, ratingsRankBlueme, ratingsRankDetailsBlueme):
 
@@ -29,7 +32,10 @@ def BuildCostManagement(generalRevenue, generalCosts, costDetails, ratingsRank, 
     merged_df = function_grand_total_line(merged_df)
     merged_df = function_formated_cost(generalCosts, merged_df)
 
+    
+    # Chamada da função com opções personalizadas
     filtered_copy, count = component_plotDataframe(merged_df, "Custos Gerais")
+
     function_copy_dataframe_as_tsv(filtered_copy)
 
     costDetails = cost_details(day_CostManagement1, day_CostManagement2)

@@ -1,8 +1,11 @@
 import streamlit as st
+import pandas as pd
 from st_aggrid import AgGrid, GridOptionsBuilder
 from st_aggrid.shared import JsCode
 from st_aggrid import GridUpdateMode
 from streamlit_echarts import st_echarts
+from st_aggrid import StAggridTheme  # Certifique-se de ter importado o tema
+
 
 
 def component_hide_sidebar():
@@ -39,22 +42,26 @@ def component_effect_underline():
     </style>
     """, unsafe_allow_html=True)
 
-def component_plotDataframe(df, name, apply_progress_bar=False):
+def component_plotDataframe(df, name):
     st.markdown(f"<h5 style='text-align: center; background-color: #ffb131; padding: 0.1em;'>{name}</h5>", unsafe_allow_html=True)
-    keywords = ['VER DETALHES', 'VER CANDIDATOS', 'DISPARAR WPP', 'PERFIL ARTISTA']  # usado para procurar colunas que contenham links
+
+    # Palavras-chave para procurar colunas que contenham links
+    keywords = ['VER DETALHES', 'VER CANDIDATOS', 'DISPARAR WPP', 'PERFIL ARTISTA']
     columns_with_link = [col_name for col_name in df.columns if any(keyword in col_name.upper() for keyword in keywords)]
-    
+
+    # Configurar as opções do grid
     gb = GridOptionsBuilder.from_dataframe(df)
     gb.configure_default_column(filter=True)  # Habilitar filtro para todas as colunas
-    
+
     # Configurar a seleção de linhas (opcional)
     gb.configure_selection(
         selection_mode='multiple',  # 'single' ou 'multiple'
-        use_checkbox=False,         # Habilitar caixas de seleção
+        use_checkbox=False,          # Habilitar caixas de seleção
         pre_selected_rows=[],
         suppressRowClickSelection=False  # Permite selecionar ao clicar em qualquer célula
     )
-    
+
+    # Construir opções do grid
     grid_options = gb.build()
 
     # Adicionar configurações adicionais para seleção de células
@@ -66,20 +73,21 @@ def component_plotDataframe(df, name, apply_progress_bar=False):
             "flex": 1,
             "minWidth": 100,
             "autoHeight": True,
-            "filter": True  # Habilitar filtro para cada coluna
+            "filter": True,  # Habilitar filtro para cada coluna
         }
     })
 
-    # Exibir o DataFrame usando AgGrid com filtros
+    custom_theme = (StAggridTheme(base="balham").withParams().withParts('colorSchemeDark'))
+
+    # Exibir o DataFrame usando AgGrid
     grid_response = AgGrid(
         df,
         gridOptions=grid_options,
         enable_enterprise_modules=True,
         update_mode=GridUpdateMode.MODEL_CHANGED,
         fit_columns_on_grid_load=True,  # Ajusta as colunas automaticamente ao carregar
-        key=f"aggrid_{name}"
-
-
+        key=f"aggrid_{name}",
+        theme=custom_theme
     )
 
     # Recupera o DataFrame filtrado
