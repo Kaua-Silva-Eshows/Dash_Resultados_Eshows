@@ -8,9 +8,9 @@ SELECT
     DATE_FORMAT(DR.COMPETENCIA, '%m/%Y') AS 'Mês/Ano',
     
     SUM(CASE WHEN G1.ID IN ('216') THEN DR.VALOR_LIQUIDO ELSE 0 END) AS 'C1 Impostos',
-    SUM(CASE WHEN G1.ID IN ('215','220','221','222','225','232', '218', '226') THEN DR.VALOR_LIQUIDO ELSE 0 END) AS 'C2 Custos de Ocupação',
+    SUM(CASE WHEN G1.ID IN ('220','221','222','225','232', '218', '226') THEN DR.VALOR_LIQUIDO ELSE 0 END) AS 'C2 Custos de Ocupação',
     SUM(CASE WHEN G1.ID IN ('223','231') THEN DR.VALOR_LIQUIDO ELSE 0 END) AS 'C3 Despesas com Pessoal Interno',
-    SUM(CASE WHEN G1.ID IN ('230', '210') THEN DR.VALOR_LIQUIDO ELSE 0 END) AS 'C4 Despesas com Pessoal Terceirizado',
+    SUM(CASE WHEN G1.ID IN ('230', '210', '215') THEN DR.VALOR_LIQUIDO ELSE 0 END) AS 'C4 Despesas com Pessoal Terceirizado',
     SUM(CASE WHEN G1.ID IN ('234') THEN DR.VALOR_LIQUIDO ELSE 0 END) AS 'C5 Despesas Operacionais com Shows',
     SUM(CASE WHEN G1.ID IN ('233') THEN DR.VALOR_LIQUIDO ELSE 0 END) AS 'C6 Despesas com Clientes',
     SUM(CASE WHEN G1.ID IN ('217') THEN DR.VALOR_LIQUIDO ELSE 0 END) AS 'C7 Despesas com Softwares e Licenças',
@@ -35,9 +35,9 @@ def costs_blueme_details(day1, day2):
 SELECT
     CASE 
         WHEN G1.ID IN ('216') THEN 'c1_Impostos'
-        WHEN G1.ID IN ('215','220','221','222','225','232', '218', '226') THEN 'c2_Custos_de_Ocupacao'
+        WHEN G1.ID IN ('220','221','222','225','232', '218', '226') THEN 'c2_Custos_de_Ocupacao'
         WHEN G1.ID IN ('223','231') THEN 'c3_Despesas_com_Pessoal_Interno'
-        WHEN G1.ID IN ('230', '210') THEN 'c4_Despesas_com_Pessoal_Terceirizado'
+        WHEN G1.ID IN ('230', '210', '215') THEN 'c4_Despesas_com_Pessoal_Terceirizado'
         WHEN G1.ID IN ('234') THEN 'c5_Problemas_Operacionais'
         WHEN G1.ID IN ('233') THEN 'c6_Despesas_com_Clientes'
         WHEN G1.ID IN ('217') THEN 'c7_Despesas_com_Softwares_e_Licencas'
@@ -83,9 +83,9 @@ SELECT
 		DR.ID AS 'ID CUSTO',
     CASE 
         WHEN G1.ID IN ('216') THEN 'c1_Impostos'
-        WHEN G1.ID IN ('215','220','221','222','225','232', '218', '226') THEN 'c2_Custos_de_Ocupacao'
+        WHEN G1.ID IN ('220','221','222','225','232', '218', '226') THEN 'c2_Custos_de_Ocupacao'
         WHEN G1.ID IN ('223','231') THEN 'c3_Despesas_com_Pessoal_Interno'
-        WHEN G1.ID IN ('230', '210') THEN 'c4_Despesas_com_Pessoal_Terceirizado'
+        WHEN G1.ID IN ('230', '210', '215') THEN 'c4_Despesas_com_Pessoal_Terceirizado'
         WHEN G1.ID IN ('234') THEN 'c5_Problemas_Operacionais'
         WHEN G1.ID IN ('233') THEN 'c6_Despesas_com_Clientes'
         WHEN G1.ID IN ('217') THEN 'c7_Despesas_com_Softwares_e_Licencas'
