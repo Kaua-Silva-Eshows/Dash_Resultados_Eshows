@@ -69,10 +69,11 @@ def component_plotDataframe(df, name):
         "enableRangeSelection": True,
         "suppressRowClickSelection": True,
         "cellSelection": True,
+        "rowHeight": 40,  # Define a altura padrão das linhas
         "defaultColDef": {
             "flex": 1,
             "minWidth": 100,
-            "autoHeight": True,
+            "autoHeight": False,  # Desativar auto-ajuste de altura para manter o espaçamento fixo
             "filter": True,  # Habilitar filtro para cada coluna
         }
     })
