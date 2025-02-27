@@ -108,9 +108,13 @@ def BuildCostManagement(generalRevenue, generalCosts, costDetails, ratingsRank, 
                 with st.expander("Classificação Detalhada"):                    
                     
                     merged_df3 = function_total_line(merged_df3, 'VALOR', 'GRUPO GERAL')
+                    first_coluns = ['ID CUSTO', 'GRUPO GERAL', 'NIVEL 1', 'NIVEL 2']  
+                    rest_columns = [col for col in merged_df3.columns if col not in first_coluns]
+                    merged_df3 = merged_df3[first_coluns + rest_columns]
+
                     merged_df3["FORNECEDOR"] = merged_df3["FORNECEDOR"].replace("nan", "", regex=False)
+                    merged_df3["NIVEL 2"] = merged_df3["NIVEL 2"].replace("nan", "", regex=False)
                     merged_df3['ID CUSTO'] = (merged_df3['ID CUSTO'].str.replace(",00", "", regex=False).str.replace("nan", "", regex=False).str.replace(".", "", regex=False))
- 
                     
                     row1 = st.columns(3)
                     tile = row1[1].container(border=True)
@@ -133,7 +137,14 @@ def BuildCostManagement(generalRevenue, generalCosts, costDetails, ratingsRank, 
 
 
                     merged_df4 = function_total_line(merged_df4, 'VALOR', 'GRUPO GERAL')
+
+                    first_coluns = ['ID CUSTO', 'GRUPO GERAL', 'NIVEL 1', 'NIVEL 2']  
+                    rest_columns = [col for col in merged_df4.columns if col not in first_coluns]
+                    merged_df4 = merged_df4[first_coluns + rest_columns]
+
+
                     merged_df4["FORNECEDOR"] = merged_df4["FORNECEDOR"].replace("nan", "", regex=False)
+                    merged_df4["NIVEL 2"] = merged_df4["NIVEL 2"].replace("nan", "", regex=False)
                     merged_df4['ID CUSTO'] = (merged_df4['ID CUSTO'].str.replace(",00", "", regex=False).str.replace("nan", "", regex=False).str.replace(".", "", regex=False))
 
 
