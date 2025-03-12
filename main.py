@@ -12,6 +12,7 @@ def initialize_session_state():
         st.session_state['page'] = 'login'
 
 def authenticate(userName: str, userPassword: str):
+    
     login_data = {
         "username": userName,
         "password": userPassword,

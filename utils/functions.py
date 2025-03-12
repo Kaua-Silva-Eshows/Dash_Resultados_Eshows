@@ -38,7 +38,6 @@ def function_copy_dataframe_as_tsv(df):
         height=100
     )
 
-
 def function_box_lenDf(len_df,df,y='', x='', box_id='', item=''):
     len_df = len(df)
     st.markdown(
@@ -77,6 +76,7 @@ def function_box_lenDf(len_df,df,y='', x='', box_id='', item=''):
         """,
         unsafe_allow_html=True
     )
+
 def function_formatted_generalrevenue(df):
     for column in df.columns:
         if column not in ['Mês/Ano', 'Total Casas', 'Total Shows', 'Percentual Faturamento']:  # Excluindo as colunas específicas
@@ -159,7 +159,6 @@ def function_total_rows(df, category):
 
     return df
 
-
 def function_format_numeric_columns(df):
     for column in df.columns:
         try:
@@ -170,7 +169,6 @@ def function_format_numeric_columns(df):
         except Exception:
             continue
     return df
-
 
 def function_marged_pivot_costDetails(df1, df2):
 
@@ -232,7 +230,6 @@ def function_marged_pivot_costDetails(df1, df2):
 
     return pivot_df
 
-
 def function_merged_and_add_df(df1, df2, column):
     merged_df = pd.merge(df1, df2, on=f'{column}', how='outer', suffixes=('_df1', '_df2'))
     columns_to_sum = [col.split('_')[0] for col in merged_df.columns if '_df1' in col]
@@ -246,7 +243,6 @@ def function_merged_and_add_df(df1, df2, column):
     merged_df[f'{column}'] = pd.to_datetime(merged_df[f'{column}'], format="%m/%Y").dt.strftime("%m/%Y")
 
     return merged_df
-
 
 def function_total_line(df, column_value, column_total):
     

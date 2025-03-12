@@ -27,24 +27,35 @@ def BuildManegementBilling(generalRevenue, groupsCompanies, generalRevenuePropos
     col1, col2 = st.columns(2)
     with col1:
         groupsCompanies = groups_companies(day_ManegementBilling1, day_ManegementBilling2)
-        selected_groups = st.multiselect("Selecione um grupo:", groupsCompanies['NOME'].unique(), default=[], placeholder='Grupos')
+        selected_groups = st.multiselect("Selecione um grupo:", ['Outros'] + sorted(filter(None, groupsCompanies['NOME'].unique())), default=[], placeholder='Grupos')
 
     filters = ''
     select_companies = []
 
     if selected_groups:
+        selected_groups.append(None)
         groupsCompanies_filtered = groupsCompanies[groupsCompanies['NOME'].isin(selected_groups)]
+
+        selected_groups_str = ", ".join(f"'{group}'" for group in selected_groups)
+
+        if "Outros" in selected_groups:
+            filters = f"AND (GC.NOME IN ({selected_groups_str}) OR (GC.NOME IS NULL))"
+        else:
+            filters = f"AND GC.NOME IN ({selected_groups_str})"
+
 
         with col2:
             select_companies = st.multiselect("Selecione as casas:", groupsCompanies_filtered['NAME'].unique(), placeholder='Casas')
+        
         if select_companies:
             groupsCompanies_filtered = groupsCompanies_filtered[groupsCompanies_filtered['NAME'].isin(select_companies)]
-        selected_groups_str = ", ".join(f"'{group}'" for group in selected_groups)
-        filters = f"AND GC.NOME IN ({selected_groups_str})"
 
         if select_companies:
             select_companies_str = ", ".join(f"'{company}'" for company in select_companies)
-            filters += f" AND C.NAME IN ({select_companies_str})"
+            if "Outros" in selected_groups:
+                filters += f" AND (C.NAME IN ({select_companies_str}) OR GC.NOME IS NULL)"
+            else:
+                filters += f" AND C.NAME IN ({select_companies_str})"
 
         generalRevenue = general_revenue(day_ManegementBilling1, day_ManegementBilling2, filters)
         generalRevenue = function_formatted_generalrevenue(generalRevenue)

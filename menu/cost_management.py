@@ -16,7 +16,6 @@ def BuildCostManagement(generalRevenue, generalCosts, costDetails, ratingsRank, 
     row1 = st.columns(6)
     global day_CostManagement1, day_CostManagement2
 
-
     with row1[2]:
         day_CostManagement1 = st.date_input('Data Inicio:', value=date(datetime.today().year - 1, 1, 1), format='DD/MM/YYYY', key='day_CostManagement1') 
     with row1[3]:
@@ -104,11 +103,11 @@ def BuildCostManagement(generalRevenue, generalCosts, costDetails, ratingsRank, 
                 ratingsRankDetails = ratings_rank_details(data_ratingsRank)
                 ratingsRankDetailsBlueme = ratings_rank_details_blueme(data_ratingsRank)
                 merged_df3 = pd.concat([ratingsRankDetails, ratingsRankDetailsBlueme], ignore_index=True)
-                
+                merged_df3 = merged_df3.assign(order_category=merged_df3["NIVEL 1"].map(merged_df3.groupby("NIVEL 1")["VALOR"].sum().rank(method="first", ascending=False))).sort_values(by=["order_category", "VALOR"], ascending=[True, False]).drop(columns=["order_category"]).reset_index(drop=True)
                 with st.expander("Classificação Detalhada"):                    
                     
                     merged_df3 = function_total_line(merged_df3, 'VALOR', 'GRUPO GERAL')
-                    first_coluns = ['ID CUSTO', 'GRUPO GERAL', 'NIVEL 1', 'NIVEL 2']  
+                    first_coluns = ['ID CUSTO', 'GRUPO GERAL', 'NIVEL 1', 'NIVEL 2', 'FORNECEDOR']  
                     rest_columns = [col for col in merged_df3.columns if col not in first_coluns]
                     merged_df3 = merged_df3[first_coluns + rest_columns]
 
@@ -132,13 +131,15 @@ def BuildCostManagement(generalRevenue, generalCosts, costDetails, ratingsRank, 
                 ratingsRankDetails2 = ratings_rank_details(data_ratingsRank2)
                 ratingsRankDetailsBlueme2 = ratings_rank_details_blueme(data_ratingsRank2)
                 merged_df4 = pd.concat([ratingsRankDetails2, ratingsRankDetailsBlueme2], ignore_index=True)
+                merged_df4 = merged_df4.assign(order_category=merged_df4["NIVEL 1"].map(merged_df4.groupby("NIVEL 1")["VALOR"].sum().rank(method="first", ascending=False))).sort_values(by=["order_category", "VALOR"], ascending=[True, False]).drop(columns=["order_category"]).reset_index(drop=True)
+
 
                 with st.expander("Classificação Detalhada"):
 
 
                     merged_df4 = function_total_line(merged_df4, 'VALOR', 'GRUPO GERAL')
 
-                    first_coluns = ['ID CUSTO', 'GRUPO GERAL', 'NIVEL 1', 'NIVEL 2']  
+                    first_coluns = ['ID CUSTO', 'GRUPO GERAL', 'NIVEL 1', 'NIVEL 2', 'FORNECEDOR']  
                     rest_columns = [col for col in merged_df4.columns if col not in first_coluns]
                     merged_df4 = merged_df4[first_coluns + rest_columns]
 
@@ -147,7 +148,6 @@ def BuildCostManagement(generalRevenue, generalCosts, costDetails, ratingsRank, 
                     merged_df4["NIVEL 2"] = merged_df4["NIVEL 2"].replace("nan", "", regex=False)
                     merged_df4['ID CUSTO'] = (merged_df4['ID CUSTO'].str.replace(",00", "", regex=False).str.replace("nan", "", regex=False).str.replace(".", "", regex=False))
 
-
                     row1 = st.columns(3)
                     tile = row1[1].container(border=True)
                     ratingsRankDetails2_pay_pending = len(merged_df4[merged_df4['PAGAMENTO'] == 'Pendente'])
@@ -155,11 +155,6 @@ def BuildCostManagement(generalRevenue, generalCosts, costDetails, ratingsRank, 
                     filtered_copy, count= component_plotDataframe(merged_df4, f"Classificação Detalhada {data_ratingsRank2}")
                     function_copy_dataframe_as_tsv(filtered_copy)
                     function_box_lenDf(len_df=count, df=filtered_copy, y='-130', x='300', box_id='box1', item='Insumos')
-
-
-
-
-
 
 class CostManagement():
     def render(self):
