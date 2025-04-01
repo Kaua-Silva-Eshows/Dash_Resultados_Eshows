@@ -2,13 +2,14 @@ import streamlit as st
 from menu.cost_management import CostManagement
 from menu.management_billing import ManegementBilling
 from utils.components import *
-from utils.user import logout
+from utils.user import *
 from data.get_data import *
 
 def render():
     # pegando dados da sessão como ID e NOME
     user_id = st.session_state['user_data']["data"]["user_id"]
     user_name = st.session_state['user_data']["data"]['full_name']
+    user_email = st.session_state['user_data']["data"]["session"]["username"]
 
     col1, col2, col3 = st.columns([3.5,0.4,0.3])
     
@@ -27,15 +28,24 @@ def render():
     
     data = initialize_data(user_id)
     # data = get_data(data) 
-    tab1, tab2 = st.tabs(["Faturamento Eshows Gerencial", "Gerenciamento de Custos"])
 
-    with tab1:
-        page = ManegementBilling()
-        page.render()
+    allowed_tabs = get_allowed_tabs(user_email)
+    
+    if not allowed_tabs:
+        st.warning("⚠ Você não possui acesso a nenhuma aba.")
+    else:
+        tabs = st.tabs(allowed_tabs)
 
-    with tab2:
-        page = CostManagement()
-        page.render()
+        tab_list = {
+            "Faturamento Eshows Gerencial": ManegementBilling,
+            "Gerenciamento de Custos": CostManagement,
+        }
+
+        for tab, tab_name in zip(tabs, allowed_tabs):
+            with tab:
+                if tab_name in tab_list:
+                    page = tab_list[tab_name]()
+                    page.render()
 
 if __name__ == "__main__":
     if 'jwt_token' not in st.session_state:

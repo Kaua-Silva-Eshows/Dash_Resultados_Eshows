@@ -149,5 +149,21 @@ ON C.CLASSIFICACAO_NIVEL1 = TOTAL_CUSTOS.CLASSIFICACAO_NIVEL1
 
 WHERE C.PRIMEIRO_DIA_MES_VENCIMENTO LIKE '{data}%'
 
-ORDER BY TOTAL_CUSTOS.TOTAL_VALOR DESC, C.VALOR DESC;
+ORDER BY TOTAL_CUSTOS.TOTAL_VALOR DESC, C.VALOR ASC;
 """, use_grupoe=True)
+
+def collaborator_access(email):
+    df = get_dataframe_from_query(f"""
+    SELECT
+        CE.EMAIL_CORPORATIVO AS 'COLABORADOR',
+        GROUP_CONCAT(AD.NIVEL) AS 'NIVEL_ACESSO'		
+    FROM T_COLABORADOR_NIVEL_ACESSO NA
+    LEFT JOIN T_COLABORADORES_ESHOWS CE ON CE.ID = NA.FK_COLABORADOR
+    LEFT JOIN T_NIVEL_ACESSO_DASH AD ON AD.ID = NA.FK_NIVEL_ACESSO
+    WHERE CE.EMAIL_CORPORATIVO = '{email}'
+    GROUP BY CE.EMAIL_CORPORATIVO
+    """, use_grupoe=True)
+    
+    if not df.empty:
+        return df['NIVEL_ACESSO'].iloc[0].split(',')  # Retorna os níveis como lista
+    return []
