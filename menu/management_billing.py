@@ -20,7 +20,15 @@ def BuildManegementBilling(generalRevenue, groupsCompanies, generalRevenuePropos
 
     with row2[0]:
         generalRevenue = general_revenue(day_ManegementBilling1, day_ManegementBilling2, filters='')
+
+
         generalRevenue = function_formatted_generalrevenue(generalRevenue)
+
+
+
+
+
+
         filtered_copy, count = component_plotDataframe(generalRevenue, "Faturamento Eshows Gerencial")
         function_copy_dataframe_as_tsv(filtered_copy)
 
@@ -45,6 +53,9 @@ def BuildManegementBilling(generalRevenue, groupsCompanies, generalRevenuePropos
 
 
         with col2:
+            if "Outros" not in selected_groups:
+                groupsCompanies_filtered = groupsCompanies_filtered.dropna(subset=['NOME'])
+
             select_companies = st.multiselect("Selecione as casas:", groupsCompanies_filtered['NAME'].unique(), placeholder='Casas')
         
         if select_companies:
@@ -65,6 +76,7 @@ def BuildManegementBilling(generalRevenue, groupsCompanies, generalRevenuePropos
 
         with st.expander("📊 Abertura por Proposta", expanded=False):
             generalRevenueProposal = general_revenue_proposal(day_ManegementBilling1, day_ManegementBilling2, filters)
+            generalRevenueProposal = function_format_numeric_columns(generalRevenueProposal)
             filtered_copy, count = component_plotDataframe(generalRevenueProposal, "Abertura por Proposta")
             function_copy_dataframe_as_tsv(filtered_copy)
             function_box_lenDf(len_df=count, df=filtered_copy, y='-100', x='500', box_id='box1', item='Propostas')
@@ -73,6 +85,7 @@ def BuildManegementBilling(generalRevenue, groupsCompanies, generalRevenuePropos
 
 class ManegementBilling():
     def render(self):
+        
         self.data = {}
         day_ManegementBilling1 = datetime.today().date()
         day_ManegementBilling2 = datetime.today().date()

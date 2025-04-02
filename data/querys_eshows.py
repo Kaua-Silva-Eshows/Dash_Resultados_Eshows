@@ -10,6 +10,9 @@ def general_revenue(day1, day2, filters):
         COUNT(DISTINCT FE.p_ID) AS 'Total Shows',
         SUM(FE.Valor_Total) AS 'Valor Total',
         SUM(FE.Comissao_Eshows_B2B) AS 'Comissão B2B',
+        SUM(
+            FE.Comissao_Eshows_B2B
+        ) / SUM(FE.Valor_Total) AS 'Take Rate',
         SUM(FE.Comissao_Eshows_B2C) AS 'Comissão B2C',
         SUM(FE.SAAS_Mensalidade) AS 'SAAS Mensalidade',
         SUM(FE.SAAS_Percentual) AS 'SAAS Percentual',
@@ -26,8 +29,15 @@ def general_revenue(day1, day2, filters):
             FE.Taxa_Emissao_NF
         ) AS 'Faturamento Total',
         SUM(
-            FE.Comissao_Eshows_B2B
-        ) / SUM(FE.Valor_Total) AS 'Percentual Faturamento'
+            FE.Comissao_Eshows_B2B + 
+            FE.Comissao_Eshows_B2C + 
+            FE.SAAS_Mensalidade + 
+            FE.SAAS_Percentual +  
+            FE.Curadoria + 
+            FE.Taxa_Adiantamento + 
+            FE.Taxa_Emissao_NF
+        ) / SUM(FE.Valor_Total)
+		AS 'Percentual Faturamento'
     FROM View_Faturam_Eshows FE
     INNER JOIN T_COMPANIES C ON FE.c_ID = C.ID
     LEFT JOIN T_GRUPOS_DE_CLIENTES GC ON C.FK_GRUPO = GC.ID

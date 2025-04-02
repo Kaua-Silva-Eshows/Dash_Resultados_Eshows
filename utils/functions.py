@@ -79,7 +79,7 @@ def function_box_lenDf(len_df,df,y='', x='', box_id='', item=''):
 
 def function_formatted_generalrevenue(df):
     for column in df.columns:
-        if column not in ['Mês/Ano', 'Total Casas', 'Total Shows', 'Percentual Faturamento']:  # Excluindo as colunas específicas
+        if column not in ['Mês/Ano', 'Total Casas', 'Total Shows', 'Percentual Faturamento', 'Take Rate']:  # Excluindo as colunas específicas
             # Convertendo a coluna para numérico, caso contenha valores não numéricos (NaN, strings)
             df[column] = pd.to_numeric(df[column], errors='coerce')  # Converte valores para numérico, não numéricos se tornam NaN
             # Aplicando a formatação numérica para valores válidos
@@ -87,6 +87,8 @@ def function_formatted_generalrevenue(df):
                 lambda x: f"{x:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".") if isinstance(x, (int, float)) else x
             )
     df["Percentual Faturamento"] = df["Percentual Faturamento"].apply(lambda x: f"{x * 100:.2f}%")
+    df["Take Rate"] = df["Take Rate"].apply(lambda x: f"{x * 100:.2f}%")
+
     return df
 
 def function_formated_cost(df, merged_df):
