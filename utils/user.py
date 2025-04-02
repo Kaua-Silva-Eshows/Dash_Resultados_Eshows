@@ -13,6 +13,8 @@ def get_allowed_tabs(email):
 
     if 'Basico' in access_levels:
         allowed_tabs.append("Faturamento Eshows Gerencial")
+    if 'Comercial' in access_levels:
+        allowed_tabs.append("Faturamento Eshows Gerencial")
     if 'Adm' in access_levels:
         allowed_tabs.append("Faturamento Eshows Gerencial")
         allowed_tabs.append("Gerenciamento de Custos")
