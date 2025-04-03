@@ -75,11 +75,20 @@ FE.c_ID AS 'ID CASA',
 FE.UF AS 'UF',
 FE.Cidade AS 'CIDADE',
 DATE_FORMAT(FE.Data, '%d/%m/%Y') AS 'DATA',
+CASE DAYOFWEEK(FE.Data)
+        WHEN 1 THEN 'Domingo'
+        WHEN 2 THEN 'Segunda-Feira'
+        WHEN 3 THEN 'Terça-Feira'
+        WHEN 4 THEN 'Quarta-Feira'
+        WHEN 5 THEN 'Quinta-Feira'
+        WHEN 6 THEN 'Sexta-Feira'
+        WHEN 7 THEN 'Sábado'
+    END AS "Dia da Semana",
 DATE_FORMAT(FE.Data_Pagamento, '%d/%m/%Y') AS 'PAGAMENTO',
 FE.Artista AS 'ARTISTA',
 FE.Valor_Bruto AS 'VALOR BRUTO',
-FE.Valor_Total AS 'VALOR TOTAL',
 FE.Valor_Liquido AS 'VALOR LIQUIDO',
+FE.Valor_Liquido / FE.Valor_Bruto AS '% LIQUIDO',
 FE.B2C AS 'B2C',
 FE.Comissao_Eshows_B2B AS 'COMISSÃO B2B',
 FE.Comissao_Eshows_B2C AS 'COMISSÃO B2C',
@@ -92,8 +101,7 @@ WHEN FE.Fk_Sem_Curadoria = '1' THEN 'COM'
 END 'CURADORIA',
 
 FE.Taxa_Emissao_NF AS 'TAXA EMISSÃO NF',
-DATE_FORMAT(FE.Primeiro_Dia_Mes, '%d/%m/%Y') AS 'PRIMEIRO DIA DO MÊS',
-FE.Semana_Ano,
+FE.Valor_Total AS 'VALOR TOTAL',
 GC.NOME AS 'Grupo',
 KE.KEYACCOUNT AS 'KeyAccount',
 O.NOME AS 'Operador'

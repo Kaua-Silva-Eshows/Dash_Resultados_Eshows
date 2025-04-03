@@ -77,20 +77,6 @@ def function_box_lenDf(len_df,df,y='', x='', box_id='', item=''):
         unsafe_allow_html=True
     )
 
-def function_formatted_generalrevenue(df):
-    for column in df.columns:
-        if column not in ['Mês/Ano', 'Total Casas', 'Total Shows', 'Percentual Faturamento', 'Take Rate']:  # Excluindo as colunas específicas
-            # Convertendo a coluna para numérico, caso contenha valores não numéricos (NaN, strings)
-            df[column] = pd.to_numeric(df[column], errors='coerce')  # Converte valores para numérico, não numéricos se tornam NaN
-            # Aplicando a formatação numérica para valores válidos
-            df[column] = df[column].apply(
-                lambda x: f"{x:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".") if isinstance(x, (int, float)) else x
-            )
-    df["Percentual Faturamento"] = df["Percentual Faturamento"].apply(lambda x: f"{x * 100:.2f}%")
-    df["Take Rate"] = df["Take Rate"].apply(lambda x: f"{x * 100:.2f}%")
-
-    return df
-
 def function_formated_cost(df, merged_df):
     for col in df.columns:
         if col not in ['Mês/Ano', 'Faturamento Total', 'Custos Totais']: 
@@ -161,16 +147,22 @@ def function_total_rows(df, category):
 
     return df
 
-def function_format_numeric_columns(df):
+def function_format_numeric_columns(df, columns_num=[], columns_percent=[]):
     for column in df.columns:
-        try:
+    
+        if column in columns_num: 
             df[column] = pd.to_numeric(df[column])
             df[column] = df[column].apply(
                 lambda x: f"{x:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".") if isinstance(x, (int, float)) else x
             )
-        except Exception:
-            continue
+
+    for column in df.columns:
+        if column in columns_percent:
+            df[column] = pd.to_numeric(df[column])
+            df[column] = df[column].apply(lambda x: f"{x * 100:.2f}%")
+
     return df
+
 
 def function_marged_pivot_costDetails(df1, df2):
 

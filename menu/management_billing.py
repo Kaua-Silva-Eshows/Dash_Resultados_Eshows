@@ -19,16 +19,9 @@ def BuildManegementBilling(generalRevenue, groupsCompanies, generalRevenuePropos
     row2 = st.columns(1)
 
     with row2[0]:
-        generalRevenue = general_revenue(day_ManegementBilling1, day_ManegementBilling2, filters='')
+        generalRevenue = general_revenue(day_ManegementBilling1, day_ManegementBilling2, filters='')    
 
-
-        generalRevenue = function_formatted_generalrevenue(generalRevenue)
-
-
-
-
-
-
+        generalRevenue = function_format_numeric_columns(generalRevenue, columns_num=['Valor Total', 'Comissão B2B', 'Comissão B2C', 'SAAS Mensalidade', 'SAAS Percentual', 'Curadoria', 'Taxa Adiantamento', 'Taxa Emissão NF', 'Faturamento Total'], columns_percent=['Take Rate','Percentual Faturamento'])
         filtered_copy, count = component_plotDataframe(generalRevenue, "Faturamento Eshows Gerencial")
         function_copy_dataframe_as_tsv(filtered_copy)
 
@@ -69,14 +62,14 @@ def BuildManegementBilling(generalRevenue, groupsCompanies, generalRevenuePropos
                 filters += f" AND C.NAME IN ({select_companies_str})"
 
         generalRevenue = general_revenue(day_ManegementBilling1, day_ManegementBilling2, filters)
-        generalRevenue = function_formatted_generalrevenue(generalRevenue)
+        generalRevenue = function_format_numeric_columns(generalRevenue, columns_num=['Valor Total', 'Comissão B2B', 'Comissão B2C', 'SAAS Mensalidade', 'SAAS Percentual', 'Curadoria', 'Taxa Adiantamento', 'Taxa Emissão NF', 'Faturamento Total'], columns_percent=['Take Rate','Percentual Faturamento'])
         filtered_copy, count = component_plotDataframe(generalRevenue, "Faturamento Detalhado")
         function_copy_dataframe_as_tsv(filtered_copy)
 
 
         with st.expander("📊 Abertura por Proposta", expanded=False):
             generalRevenueProposal = general_revenue_proposal(day_ManegementBilling1, day_ManegementBilling2, filters)
-            generalRevenueProposal = function_format_numeric_columns(generalRevenueProposal)
+            generalRevenueProposal = function_format_numeric_columns(generalRevenueProposal, columns_num=['VALOR BRUTO','VALOR LIQUIDO','VALOR TOTAL','COMISSÃO B2B','COMISSÃO B2C','ADIANTAMENTO','SAAS PERCENTUAL','SAAS MENSALIDADE','TAXA EMISSÃO NF'], columns_percent=['% LIQUIDO'])
             filtered_copy, count = component_plotDataframe(generalRevenueProposal, "Abertura por Proposta")
             function_copy_dataframe_as_tsv(filtered_copy)
             function_box_lenDf(len_df=count, df=filtered_copy, y='-100', x='500', box_id='box1', item='Propostas')
