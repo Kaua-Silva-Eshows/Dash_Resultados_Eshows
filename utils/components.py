@@ -162,7 +162,7 @@ function(params) {
     # Recupera o DataFrame filtrado
     
     filtered_df = grid_response['data']
-
+    filtered_df = filtered_df.drop(columns=[col for col in filtered_df.columns if col.endswith('_NUM')], errors='ignore')
     return filtered_df, len(filtered_df)
 
 def component_plotPizzaChart(labels, sizes, name, max_columns=8):
