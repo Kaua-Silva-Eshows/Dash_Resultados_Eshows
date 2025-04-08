@@ -163,7 +163,6 @@ def function_format_numeric_columns(df, columns_num=[], columns_percent=[]):
 
     return df
 
-
 def function_marged_pivot_costDetails(df1, df2):
 
     merged_df = pd.merge(

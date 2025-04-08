@@ -55,10 +55,12 @@ def groups_companies(day1, day2):
     return get_dataframe_from_query(F"""
 SELECT 
 GC.NOME,
-C.NAME
+C.NAME,
+KY.NOME AS 'KY'
 FROM View_Faturam_Eshows FE
 INNER JOIN T_COMPANIES C ON FE.c_ID = C.ID
 LEFT JOIN T_GRUPOS_DE_CLIENTES GC ON C.FK_GRUPO = GC.ID
+LEFT JOIN T_KEYACCOUNT_ESTABELECIMENTO KY ON KY.ID = C.FK_KEYACCOUNT
 WHERE FE.Data >= '{day1}'
 AND FE.Data <= '{day2}'
 GROUP BY C.NAME
