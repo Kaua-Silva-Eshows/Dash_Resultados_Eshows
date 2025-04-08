@@ -159,7 +159,7 @@ def function_format_numeric_columns(df, columns_num=[], columns_percent=[]):
     for column in df.columns:
         if column in columns_percent:
             df[column] = pd.to_numeric(df[column])
-            df[column] = df[column].apply(lambda x: f"{x * 100:.2f}%")
+            df[column] = df[column].apply(lambda x: f"{x * 100:.2f}%".replace('.', ','))
 
     return df
 

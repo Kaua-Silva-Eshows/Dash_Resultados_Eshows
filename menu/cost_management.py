@@ -7,9 +7,10 @@ from menu.page import Page
 from utils.components import *
 from utils.functions import *
 from datetime import date, datetime
-from st_aggrid import AgGrid, GridOptionsBuilder
-from st_aggrid.shared import JsCode
-from st_aggrid import GridUpdateMode
+import calendar
+from st_aggrid.grid_options_builder import GridOptionsBuilder
+from st_aggrid import AgGrid, GridUpdateMode
+
 
 def BuildCostManagement(generalRevenue, generalCosts, costDetails, ratingsRank, ratingsRankDetails, generalCostsBlueme, costsBluemeDetails, ratingsRankBlueme, ratingsRankDetailsBlueme):
 
@@ -19,28 +20,27 @@ def BuildCostManagement(generalRevenue, generalCosts, costDetails, ratingsRank, 
     with row1[2]:
         day_CostManagement1 = st.date_input('Data Inicio:', value=date(datetime.today().year - 1, 1, 1), format='DD/MM/YYYY', key='day_CostManagement1') 
     with row1[3]:
-        day_CostManagement2 = st.date_input('Data Final:', value=date(datetime.today().year, 12, 31), format='DD/MM/YYYY', key='day_CostManagement2')
+        day_CostManagement2 = st.date_input('Data Final:', value=date(datetime.today().year, datetime.today().month, calendar.monthrange(datetime.today().year, datetime.today().month)[1]), format='DD/MM/YYYY', key='day_CostManagement2')
 
-    generalRevenue = general_revenue(day_CostManagement1, day_CostManagement2, filters='')
+    generalRevenue = general_revenue(day_CostManagement1, day_CostManagement2)
     generalCosts = general_costs(day_CostManagement1, day_CostManagement2)
     generalCostsBlueme = general_costs_blueme(day_CostManagement1, day_CostManagement2)
-
-    merged_df = pd.merge(generalCosts, generalRevenue[['Mês/Ano', 'Faturamento Total']], on='Mês/Ano', how='left')
+    merged_df = pd.merge(generalCosts, generalRevenue[['Mês/Ano', 'Faturamento Total']], on='Mês/Ano', how='right')
 
     merged_df = function_merged_and_add_df(merged_df, generalCostsBlueme, column='Mês/Ano')
     merged_df = function_grand_total_line(merged_df)
     merged_df = function_formated_cost(generalCosts, merged_df)
-
     
-    # Chamada da função com opções personalizadas
-    filtered_copy, count = component_plotDataframe(merged_df, "Custos Gerais")
+    filtered_df, count = component_plotDataframe(merged_df, "Custos Gerais", num_columns=['Resultado Final'], percent_columns=['Res%'])
 
-    function_copy_dataframe_as_tsv(filtered_copy)
+    function_copy_dataframe_as_tsv(filtered_df)
 
     costDetails = cost_details(day_CostManagement1, day_CostManagement2)
     costsBluemeDetails = costs_blueme_details(day_CostManagement1, day_CostManagement2)
 
     pivot_costDetails = function_marged_pivot_costDetails(costDetails, costsBluemeDetails)
+    columns_num = pivot_costDetails.columns[2:].tolist()
+    function_format_numeric_columns(pivot_costDetails, columns_num=columns_num)
 
     filtered_copy, count= component_plotDataframe(pivot_costDetails, "Custos Especificos")
     function_copy_dataframe_as_tsv(filtered_copy)
@@ -73,7 +73,7 @@ def BuildCostManagement(generalRevenue, generalCosts, costDetails, ratingsRank, 
                 component_plotPizzaChart(merged_df1["CLASSIFICAÇÃO PRIMÁRIA"], merged_df1["VALOR"], None)
 
                 merged_df1 = function_total_line(merged_df1, 'VALOR', 'CLASSIFICAÇÃO PRIMÁRIA') 
-
+                function_format_numeric_columns(merged_df1, columns_num=['VALOR'])
                 filtered_copy, count= component_plotDataframe(merged_df1, f"Custos {data_ratingsRank}")
 
                 function_copy_dataframe_as_tsv(filtered_copy)
@@ -90,7 +90,7 @@ def BuildCostManagement(generalRevenue, generalCosts, costDetails, ratingsRank, 
 
                 merged_df2 = function_total_line(merged_df2, 'VALOR', 'CLASSIFICAÇÃO PRIMÁRIA')
 
-
+                function_format_numeric_columns(merged_df2, columns_num=['VALOR'])
                 filtered_copy, count= component_plotDataframe(merged_df2, f"Custos {data_ratingsRank2}")
                 function_copy_dataframe_as_tsv(filtered_copy)
 
@@ -113,13 +113,13 @@ def BuildCostManagement(generalRevenue, generalCosts, costDetails, ratingsRank, 
 
                     merged_df3["FORNECEDOR"] = merged_df3["FORNECEDOR"].replace("nan", "", regex=False)
                     merged_df3["NIVEL 2"] = merged_df3["NIVEL 2"].replace("nan", "", regex=False)
-                    merged_df3['ID CUSTO'] = (merged_df3['ID CUSTO'].str.replace(",00", "", regex=False).str.replace("nan", "", regex=False).str.replace(".", "", regex=False))
+                    merged_df3['ID CUSTO'] = merged_df3['ID CUSTO'].astype(str).str.replace('Invalid Number', '', regex=False) #Eu sei que é gambiarra mas não um modo melhor '-'
                     
                     row1 = st.columns(3)
                     tile = row1[1].container(border=True)
                     ratingsRankDetails_pay_pending = len(merged_df3[merged_df3['PAGAMENTO'] == 'Pendente'])
                     tile.write(f"<p style='text-align: center;'> Pagamentos Pendentes </br>{ ratingsRankDetails_pay_pending }</p>", unsafe_allow_html=True)
-                    
+                    function_format_numeric_columns(merged_df3, columns_num=['VALOR'])
                     filtered_copy, count= component_plotDataframe(merged_df3, f"Classificação Detalhada {data_ratingsRank}")
                     function_copy_dataframe_as_tsv(filtered_copy)
                     function_box_lenDf(len_df=count, df=filtered_copy, y='-130', x='300', box_id='box1', item='Insumos')
@@ -136,7 +136,6 @@ def BuildCostManagement(generalRevenue, generalCosts, costDetails, ratingsRank, 
 
                 with st.expander("Classificação Detalhada"):
 
-
                     merged_df4 = function_total_line(merged_df4, 'VALOR', 'GRUPO GERAL')
 
                     first_coluns = ['ID CUSTO', 'GRUPO GERAL', 'NIVEL 1', 'NIVEL 2', 'FORNECEDOR']  
@@ -146,12 +145,13 @@ def BuildCostManagement(generalRevenue, generalCosts, costDetails, ratingsRank, 
 
                     merged_df4["FORNECEDOR"] = merged_df4["FORNECEDOR"].replace("nan", "", regex=False)
                     merged_df4["NIVEL 2"] = merged_df4["NIVEL 2"].replace("nan", "", regex=False)
-                    merged_df4['ID CUSTO'] = (merged_df4['ID CUSTO'].str.replace(",00", "", regex=False).str.replace("nan", "", regex=False).str.replace(".", "", regex=False))
+                    merged_df4['ID CUSTO'] = merged_df4['ID CUSTO'].astype(str).str.replace('Invalid Number', '', regex=False) 
 
                     row1 = st.columns(3)
                     tile = row1[1].container(border=True)
                     ratingsRankDetails2_pay_pending = len(merged_df4[merged_df4['PAGAMENTO'] == 'Pendente'])
                     tile.write(f"<p style='text-align: center;'> Pagamentos Pendentes </br>{ ratingsRankDetails2_pay_pending }</p>", unsafe_allow_html=True)
+                    function_format_numeric_columns(merged_df4, columns_num=['VALOR'])
                     filtered_copy, count= component_plotDataframe(merged_df4, f"Classificação Detalhada {data_ratingsRank2}")
                     function_copy_dataframe_as_tsv(filtered_copy)
                     function_box_lenDf(len_df=count, df=filtered_copy, y='-130', x='300', box_id='box1', item='Insumos')
