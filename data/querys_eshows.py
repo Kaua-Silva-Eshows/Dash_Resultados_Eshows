@@ -2,7 +2,7 @@ from data.dbconnect import get_dataframe_from_query
 import streamlit as st
 
 @st.cache_data
-def general_revenue(day1, day2, filters):
+def general_revenue(day1, day2, filters=''):
     return get_dataframe_from_query(f"""
     SELECT 
         DATE_FORMAT(FE.Data, '%m/%Y') AS 'Mês/Ano',
@@ -51,18 +51,20 @@ def general_revenue(day1, day2, filters):
     """)
 
 @st.cache_data
-def groups_companies(day1, day2):
+def groups_companies(day1, day2, filters=''):
     return get_dataframe_from_query(F"""
 SELECT 
 GC.NOME,
 C.NAME,
-KY.NOME AS 'KY'
+KE.NOME AS 'KY'
 FROM View_Faturam_Eshows FE
 INNER JOIN T_COMPANIES C ON FE.c_ID = C.ID
 LEFT JOIN T_GRUPOS_DE_CLIENTES GC ON C.FK_GRUPO = GC.ID
-LEFT JOIN T_KEYACCOUNT_ESTABELECIMENTO KY ON KY.ID = C.FK_KEYACCOUNT
+LEFT JOIN T_KEYACCOUNT_ESTABELECIMENTO KE ON C.FK_KEYACCOUNT = KE.ID
+LEFT JOIN T_OPERADORES OP ON C.FK_OPERADOR = OP.ID
 WHERE FE.Data >= '{day1}'
-AND FE.Data <= '{day2}'
+AND FE.Data <= DATE_ADD('{day2}', INTERVAL 1 DAY)
+{filters}
 GROUP BY C.NAME
 ORDER BY GC.NOME
 """)
