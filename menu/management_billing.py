@@ -40,9 +40,17 @@ def BuildManegementBilling(generalRevenue, groupsCompanies, generalRevenuePropos
             filters = f"AND GC.NOME IN ({selected_groups_str})"
 
         with col2:
+            groupsCompanies = groups_companies(day_ManegementBilling1, day_ManegementBilling2, filters)
+            select_keyaccount = st.multiselect("Selecione o KY", options=groupsCompanies['KY'].dropna().unique(), default=None,placeholder='KY')            
+            select_keyaccount_str = ", ".join(f"'{ky}'" for ky in select_keyaccount)
+            if select_keyaccount:
+                filters += f" AND KE.NOME IN ({select_keyaccount_str})"
+
+
+        with col3:
+            groupsCompanies_filtered = groups_companies(day_ManegementBilling1, day_ManegementBilling2, filters)
             if "Outros" not in selected_groups:
                 groupsCompanies_filtered = groupsCompanies_filtered.dropna(subset=['NOME'])
-
             select_companies = st.multiselect("Selecione as casas:", groupsCompanies_filtered['NAME'].unique(), placeholder='Casas')
         
         if select_companies:
@@ -54,13 +62,6 @@ def BuildManegementBilling(generalRevenue, groupsCompanies, generalRevenuePropos
                 filters += f" AND (C.NAME IN ({select_companies_str}) OR GC.NOME IS NULL)"
             else:
                 filters += f" AND C.NAME IN ({select_companies_str})"
-
-        with col3:
-            groupsCompanies = groups_companies(day_ManegementBilling1, day_ManegementBilling2, filters)
-            select_keyaccount = st.multiselect("Selecione o KY", options=groupsCompanies['KY'].dropna().unique(), default=None,placeholder='KY')            
-            select_keyaccount_str = ", ".join(f"'{ky}'" for ky in select_keyaccount)
-            if select_keyaccount:
-                filters += f" AND KE.NOME IN ({select_keyaccount_str})"
 
         generalRevenue = general_revenue(day_ManegementBilling1, day_ManegementBilling2, filters)
         generalRevenue = function_format_numeric_columns(generalRevenue, columns_num=['Valor Total', 'Comissão B2B', 'Comissão B2C', 'SAAS Mensalidade', 'SAAS Percentual', 'Curadoria', 'Taxa Adiantamento', 'Taxa Emissão NF', 'Faturamento Total'], columns_percent=['Take Rate','Percentual Faturamento'])
