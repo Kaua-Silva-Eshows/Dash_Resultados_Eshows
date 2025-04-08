@@ -18,8 +18,7 @@ def BuildManegementBilling(generalRevenue, groupsCompanies, generalRevenuePropos
     row2 = st.columns(1)
 
     with row2[0]:
-        generalRevenue = general_revenue(day_ManegementBilling1, day_ManegementBilling2, filters='')    
-
+        generalRevenue = general_revenue(day_ManegementBilling1, day_ManegementBilling2)    
         generalRevenue = function_format_numeric_columns(generalRevenue, columns_num=['Valor Total', 'Comissão B2B', 'Comissão B2C', 'SAAS Mensalidade', 'SAAS Percentual', 'Curadoria', 'Taxa Adiantamento', 'Taxa Emissão NF', 'Faturamento Total'], columns_percent=['Take Rate','Percentual Faturamento'])
         filtered_copy, count = component_plotDataframe(generalRevenue, "Faturamento Eshows Gerencial")
         function_copy_dataframe_as_tsv(filtered_copy)
@@ -28,9 +27,6 @@ def BuildManegementBilling(generalRevenue, groupsCompanies, generalRevenuePropos
     with col1:
         groupsCompanies = groups_companies(day_ManegementBilling1, day_ManegementBilling2)
         selected_groups = st.multiselect("Selecione um grupo:", ['Outros'] + sorted(filter(None, groupsCompanies['NOME'].unique())), default=[], placeholder='Grupos')
-
-    filters = ''
-    select_companies = []
 
     if selected_groups:
         selected_groups.append(None)
@@ -60,7 +56,7 @@ def BuildManegementBilling(generalRevenue, groupsCompanies, generalRevenuePropos
                 filters += f" AND C.NAME IN ({select_companies_str})"
 
         with col3:
-
+            groupsCompanies = groups_companies(day_ManegementBilling1, day_ManegementBilling2, filters)
             select_keyaccount = st.multiselect("Selecione o KY", options=groupsCompanies['KY'].dropna().unique(), default=None,placeholder='KY')            
             select_keyaccount_str = ", ".join(f"'{ky}'" for ky in select_keyaccount)
             if select_keyaccount:
