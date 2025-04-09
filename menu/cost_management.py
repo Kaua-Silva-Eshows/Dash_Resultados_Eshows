@@ -113,8 +113,8 @@ def BuildCostManagement(generalRevenue, generalCosts, costDetails, ratingsRank, 
 
                     merged_df3["FORNECEDOR"] = merged_df3["FORNECEDOR"].replace("nan", "", regex=False)
                     merged_df3["NIVEL 2"] = merged_df3["NIVEL 2"].replace("nan", "", regex=False)
-                    merged_df3['ID CUSTO'] = merged_df3['ID CUSTO'].astype(str).str.replace('Invalid Number', '', regex=False) #Eu sei que é gambiarra mas não um modo melhor '-'
-                    
+                    merged_df3['ID CUSTO'] = merged_df3['ID CUSTO'].astype(str).str.replace('Invalid Number', '', regex=False) #Sei que é gambiarra mas não pensei em outra solução '-'
+
                     row1 = st.columns(3)
                     tile = row1[1].container(border=True)
                     ratingsRankDetails_pay_pending = len(merged_df3[merged_df3['PAGAMENTO'] == 'Pendente'])
@@ -133,11 +133,9 @@ def BuildCostManagement(generalRevenue, generalCosts, costDetails, ratingsRank, 
                 merged_df4 = pd.concat([ratingsRankDetails2, ratingsRankDetailsBlueme2], ignore_index=True)
                 merged_df4 = merged_df4.assign(order_category=merged_df4["NIVEL 1"].map(merged_df4.groupby("NIVEL 1")["VALOR"].sum().rank(method="first", ascending=False))).sort_values(by=["order_category", "VALOR"], ascending=[True, False]).drop(columns=["order_category"]).reset_index(drop=True)
 
-
                 with st.expander("Classificação Detalhada"):
 
                     merged_df4 = function_total_line(merged_df4, 'VALOR', 'GRUPO GERAL')
-
                     first_coluns = ['ID CUSTO', 'GRUPO GERAL', 'NIVEL 1', 'NIVEL 2', 'FORNECEDOR']  
                     rest_columns = [col for col in merged_df4.columns if col not in first_coluns]
                     merged_df4 = merged_df4[first_coluns + rest_columns]
@@ -145,7 +143,7 @@ def BuildCostManagement(generalRevenue, generalCosts, costDetails, ratingsRank, 
 
                     merged_df4["FORNECEDOR"] = merged_df4["FORNECEDOR"].replace("nan", "", regex=False)
                     merged_df4["NIVEL 2"] = merged_df4["NIVEL 2"].replace("nan", "", regex=False)
-                    merged_df4['ID CUSTO'] = merged_df4['ID CUSTO'].astype(str).str.replace('Invalid Number', '', regex=False) 
+                    merged_df4['ID CUSTO'] = merged_df4['ID CUSTO'].astype(str).str.replace('Invalid Number', '', regex=False)
 
                     row1 = st.columns(3)
                     tile = row1[1].container(border=True)
