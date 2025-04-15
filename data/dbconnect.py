@@ -1,7 +1,6 @@
 import mysql.connector
 import streamlit as st
 import pandas as pd
-from datetime import datetime
 
 def get_mysql_connection_eshows():
     mysql_config = st.secrets["mysql_eshows"]
@@ -38,7 +37,6 @@ def get_mysql_connection_blueme():
         password=mysql_config['password']    
     )    
     return conn
-
 
 def execute_query(query, use_grupoe=False, use_blueme=False):
     conn = (

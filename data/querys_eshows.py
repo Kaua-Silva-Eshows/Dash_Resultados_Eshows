@@ -119,4 +119,3 @@ AND FE.Data <= '{day2}'
 {filters}
 ORDER BY FE.Data, FE.Casa
 """)
-

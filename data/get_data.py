@@ -1,6 +1,4 @@
 import pandas as pd
-import streamlit as st
-from utils.functions import *
 
 def initialize_data(id):
     # Dicionário com dados de entrada
