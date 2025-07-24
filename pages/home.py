@@ -4,13 +4,16 @@ from menu.management_billing import ManegementBilling
 from utils.components import *
 from utils.user import *
 from data.get_data import *
+from streamlit_theme import st_theme
 
 def render():
-    # pegando dados da sessão como ID e NOME
     user_id = st.session_state['user_data']["data"]["user_id"]
     user_name = st.session_state['user_data']["data"]['full_name']
     user_email = st.session_state['user_data']["data"]["session"]["username"]
-
+    # Armazena no session_state
+    theme = st_theme(key=f"theme_")
+    base_theme = theme.get("base") if theme else "default"
+    st.session_state["base_theme"] = base_theme
     col1, col2, col3 = st.columns([3.5,0.4,0.3])
     
     col1.write(f"## Olá, "+user_name)
@@ -35,12 +38,10 @@ def render():
         st.warning("⚠ Você não possui acesso a nenhuma aba.")
     else:
         tabs = st.tabs(allowed_tabs)
-
         tab_list = {
             "Faturamento Eshows Gerencial": ManegementBilling,
             "Gerenciamento de Custos": CostManagement,
         }
-
         for tab, tab_name in zip(tabs, allowed_tabs):
             with tab:
                 if tab_name in tab_list:

@@ -29,7 +29,6 @@ def authenticate(userName: str, userPassword: str):
             return None
     except Exception as e:
             st.error("Não foi possível acessar seu login")
-
 def main():
     initialize_session_state()
     if st.session_state['jwt_token']:
