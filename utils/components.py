@@ -24,20 +24,12 @@ def component_fix_tab_echarts():
     return st.markdown(streamlit_style, unsafe_allow_html=True)
 
 def component_effect_underline():
-    st.markdown("""
-    <style>
-        .full-width-line-white {
-            width: 100%;
-            border-bottom: 1px solid #ffffff;
-            margin-bottom: 0.5em;
-        }
-        .full-width-line-black {
-            width: 100%;
-            border-bottom: 1px solid #000000;
-            margin-bottom: 0.5em;
-        }
-    </style>
-    """, unsafe_allow_html=True)
+    if st.session_state.get("base_theme") == "dark":
+        color = "#ffffff"
+    else:
+        color = "#000000" 
+    st.markdown(
+    f"""<style>.full-width-line-white {{width: 100%;border-bottom: 1px solid {color};margin-bottom: 0.5em;}}</style>""",unsafe_allow_html=True)
 
 def component_plotDataframe(df, name, num_columns=[], percent_columns=[], df_details=None, coluns_merge_details=None, coluns_name_details=None, key="default"):
     st.markdown(f"<h5 style='text-align: center; background-color: #ffb131; padding: 0.1em;'>{name}</h5>", unsafe_allow_html=True)
