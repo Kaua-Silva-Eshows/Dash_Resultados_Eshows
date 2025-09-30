@@ -7,6 +7,21 @@ from datetime import date, datetime
 
 def BuildManegementBilling(generalRevenue, groupsCompanies, generalRevenueProposal):
 
+    row = st.columns(3)
+    with row[1]:
+        commision_type = st.selectbox(
+            "Filtro de Comissão Eshows B2B:",
+            options=["Geral", "Com Comissão", "Sem comissão"],
+            index=0
+        )
+    # Define o filtro inicial
+    if commision_type == "Com Comissão":
+        filters = "AND FE.Comissao_Eshows_B2B > 0"
+    elif commision_type == "Sem comissão":
+        filters = "AND FE.Comissao_Eshows_B2B = 0"
+    else:
+        filters = ""  # Geral, sem filtro
+
     row1 = st.columns(6)
     global day_ManegementBilling1, day_ManegementBilling2
     
@@ -17,7 +32,7 @@ def BuildManegementBilling(generalRevenue, groupsCompanies, generalRevenuePropos
 
     row2 = st.columns(1)
     with row2[0]:
-        generalRevenue = general_revenue(day_ManegementBilling1, day_ManegementBilling2)    
+        generalRevenue = general_revenue(day_ManegementBilling1, day_ManegementBilling2, filters)    
         generalRevenue = function_format_numeric_columns(generalRevenue, columns_num=['Valor Total', 'Comissão B2B', 'Comissão B2C', 'SAAS Mensalidade', 'SAAS Percentual', 'Curadoria', 'Taxa Adiantamento', 'Taxa Emissão NF', 'Faturamento Total'], columns_percent=['Take Rate','Percentual Faturamento'])
         filtered_copy, count = component_plotDataframe(generalRevenue, "Faturamento Eshows Gerencial")
         function_copy_dataframe_as_tsv(filtered_copy)
@@ -27,7 +42,7 @@ def BuildManegementBilling(generalRevenue, groupsCompanies, generalRevenuePropos
         
         cols = st.columns([2,1,1])
         with cols[0]:
-            groupsCompanies = groups_companies(day_ManegementBilling1, day_ManegementBilling2)
+            groupsCompanies = groups_companies(day_ManegementBilling1, day_ManegementBilling2, filters)
 
             selected_groups = st.multiselect("Selecione um grupo:", ['Outros'] + sorted(filter(None, groupsCompanies['NOME'].unique())), default=[], placeholder='Grupos')
         if selected_groups:
@@ -36,9 +51,9 @@ def BuildManegementBilling(generalRevenue, groupsCompanies, generalRevenuePropos
 
             selected_groups_str = ", ".join(f"'{group}'" for group in selected_groups)
             if "Outros" in selected_groups:
-                filters = f"AND (GC.NOME IN ({selected_groups_str}) OR (GC.NOME IS NULL))"
+                filters += f" AND (GC.NOME IN ({selected_groups_str}) OR (GC.NOME IS NULL))"
             else:
-                filters = f"AND GC.NOME IN ({selected_groups_str})"
+                filters += f" AND GC.NOME IN ({selected_groups_str})"
 
             with cols[1]:
                 groupsCompanies = groups_companies(day_ManegementBilling1, day_ManegementBilling2, filters)

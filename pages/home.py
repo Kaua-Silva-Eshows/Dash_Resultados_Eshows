@@ -31,8 +31,17 @@ def render():
     
     data = initialize_data(user_id)
     # data = get_data(data) 
-
-    allowed_tabs = get_allowed_tabs(user_email)
+    tab_list = {
+            "Faturamento Eshows Gerencial": ManegementBilling,
+            "Gerenciamento de Custos": CostManagement,
+        }
+    #Email admin
+    if user_email == "kaua.silva@eshows.com.br":
+        allowed_tabs = list(tab_list.keys())
+    else:
+        allowed_tabs = get_allowed_tabs(user_email)
+    
+    #allowed_tabs = get_allowed_tabs(user_email)
     
     if not allowed_tabs:
         st.warning("⚠ Você não possui acesso a nenhuma aba.")
