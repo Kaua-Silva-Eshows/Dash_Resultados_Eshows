@@ -25,8 +25,8 @@ def BuildCostManagement(generalRevenue, generalCosts, costDetails, ratingsRank, 
     generalRevenue = general_revenue(day_CostManagement1, day_CostManagement2)
     generalCosts = general_costs(day_CostManagement1, day_CostManagement2)
     generalCostsBlueme = general_costs_blueme(day_CostManagement1, day_CostManagement2)
+    
     merged_df = pd.merge(generalCosts, generalRevenue[['Mês/Ano', 'Faturamento Total']], on='Mês/Ano', how='right')
-
     merged_df = function_merged_and_add_df(merged_df, generalCostsBlueme, column='Mês/Ano')
     merged_df = function_grand_total_line(merged_df)
     merged_df = function_formated_cost(generalCosts, merged_df)

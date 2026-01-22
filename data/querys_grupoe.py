@@ -15,6 +15,7 @@ SELECT
     SUM(CASE WHEN CEC.ID_Categoria = 108 THEN CEC.Valor END) AS 'C7 Despesas com Softwares e Licenças',
     SUM(CASE WHEN CEC.ID_Categoria = 107 THEN CEC.Valor END) AS 'C8 Despesas com Marketing',
     SUM(CASE WHEN CEC.ID_Categoria = 106 THEN CEC.Valor END) AS 'C9 Despesas Financeiras',
+    NULL AS 'C10 Investimentos',
     SUM(CEC.Valor) AS 'Custos Totais'
 FROM View_Custos_Eshows_Consolidados CEC
 WHERE CEC.Primeiro_Dia_Mes_Vencimento >= '{day1}'

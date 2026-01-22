@@ -106,20 +106,18 @@ def function_box_lenDf(len_df,df,y='', x='', box_id='', item=''):
 def function_formated_cost(df, merged_df):
     for col in df.columns:
         if col not in ['Mês/Ano', 'Faturamento Total', 'Custos Totais']: 
+            col_code = col.split()[0]
             if (merged_df['Faturamento Total'].eq(0)).any():
-                merged_df[f'{col[:2]}%'] = 0
+                merged_df[f'{col_code}%'] = 0
             else:
-                merged_df[f'{col[:2]}%'] = (merged_df[col] / merged_df['Faturamento Total']) * 100
-
+                merged_df[f'{col_code}%'] = (merged_df[col] / merged_df['Faturamento Total']) * 100
     # Calcula o resultado total (faturamento - custo total)
     merged_df['Resultado Final'] = merged_df['Faturamento Total'] - merged_df['Custos Totais']
-
     # Adiciona a porcentagem de lucro
     merged_df['Res%'] = merged_df.apply(
         lambda row: (row['Resultado Final'] / row['Faturamento Total']) * 100 
         if row['Faturamento Total'] != 0 else 0, axis=1
     )
-
     for col in merged_df.columns:
         if col.endswith('%'):
             merged_df[col] = merged_df[col].apply(lambda x: f'{x:.2f}%' if pd.notna(x) else '0.00%')
@@ -127,13 +125,13 @@ def function_formated_cost(df, merged_df):
     # Reorganiza as colunas
     cols_order = ['Mês/Ano', 'Faturamento Total','C1 Impostos', 'C1%', 'C2 Custos de Ocupação', 'C2%', 'C3 Despesas com Pessoal Interno', 'C3%', 
     'C4 Despesas com Pessoal Terceirizado', 'C4%', 'C5 Despesas Operacionais com Shows', 'C5%', 'C6 Despesas com Clientes', 'C6%', 'C7 Despesas com Softwares e Licenças', 
-    'C7%', 'C8 Despesas com Marketing', 'C8%', 'C9 Despesas Financeiras', 'C9%', 'Custos Totais', 'Resultado Final', 'Res%']
+    'C7%', 'C8 Despesas com Marketing', 'C8%', 'C9 Despesas Financeiras', 'C9%', 'Custos Totais', 'C10 Investimentos', 'C10%', 'Resultado Final', 'Res%']
     merged_df = merged_df[cols_order]
 
     for col in merged_df.columns:
         if col in ['Faturamento Total','C1 Impostos','C2 Custos de Ocupação', 'C3 Despesas com Pessoal Interno', 
         'C4 Despesas com Pessoal Terceirizado', 'C5 Despesas Operacionais com Shows', 'C6 Despesas com Clientes', 
-        'C7 Despesas com Softwares e Licenças', 'C8 Despesas com Marketing', 'C9 Despesas Financeiras', 'Custos Totais', 'Resultado Final']:
+        'C7 Despesas com Softwares e Licenças', 'C8 Despesas com Marketing', 'C9 Despesas Financeiras', 'Custos Totais', 'C10 Investimentos', 'Resultado Final']:
             merged_df[col] = pd.to_numeric(merged_df[col], errors='coerce')
             merged_df[col] = merged_df[col].fillna(0)
             merged_df[col] = merged_df[col].apply(
@@ -156,6 +154,7 @@ def function_grand_total_line(df):
     row['C7 Despesas com Softwares e Licenças'] = df['C7 Despesas com Softwares e Licenças'].sum()
     row['C8 Despesas com Marketing'] = df['C8 Despesas com Marketing'].sum()
     row['C9 Despesas Financeiras'] = df['C9 Despesas Financeiras'].sum()
+    row['C10 Investimentos'] = df['C10 Investimentos'].sum()
     row['Custos Totais'] = df['Custos Totais'].sum()
     df = pd.concat([df, row.to_frame().T], ignore_index=True)
 
@@ -216,6 +215,14 @@ def function_marged_pivot_costDetails(df1, df2):
     fill_value=0
     ).reset_index()
     
+    # Ordena as categorias de custo ANTES de adicionar totais
+    category_order = ['c1_Impostos', 'c2_Custos_de_Ocupacao', 'c3_Despesas_com_Pessoal_Interno', 
+                      'c4_Despesas_com_Pessoal_Terceirizado', 'c5_Despesas_Operacionais_com_Shows',
+                      'c6_Despesas_com_Clientes', 'c7_Despesas_com_Softwares_e_Licencas',
+                      'c8_Despesas_com_Marketing', 'c9_Despesas_Financeiras', 'c10_Investimentos']
+    pivot_df['sort_order'] = pivot_df['CATEGORIA DE CUSTO'].apply(lambda x: category_order.index(x) if x in category_order else len(category_order))
+    pivot_df = pivot_df.sort_values(['sort_order', 'CLASSIFICAÇÃO PRIMÁRIA']).drop(columns='sort_order').reset_index(drop=True)
+    
     if (pivot_df['CATEGORIA DE CUSTO'] == 'c1_Impostos').any():
         pivot_df = function_total_rows(pivot_df, 'c1_Impostos')
     if (pivot_df['CATEGORIA DE CUSTO'] == 'c2_Custos_de_Ocupacao').any():
@@ -234,6 +241,8 @@ def function_marged_pivot_costDetails(df1, df2):
         pivot_df = function_total_rows(pivot_df, 'c8_Despesas_com_Marketing')
     if (pivot_df['CATEGORIA DE CUSTO'] == 'c9_Despesas_Financeiras').any():
         pivot_df = function_total_rows(pivot_df, 'c9_Despesas_Financeiras')
+    if (pivot_df['CATEGORIA DE CUSTO'] == 'c10_Investimentos').any():
+        pivot_df = function_total_rows(pivot_df, 'c10_Investimentos')
 
     row = pd.Series()
     for col in pivot_df.columns:
@@ -243,8 +252,11 @@ def function_marged_pivot_costDetails(df1, df2):
     row['CATEGORIA DE CUSTO'] = '💰 Custo Geral'
     pivot_df = pd.concat([pivot_df, row.to_frame().T]).reset_index(drop=True)
     pivot_df['Total Do Periodo'] = pivot_df.drop(columns=['CATEGORIA DE CUSTO', 'CLASSIFICAÇÃO PRIMÁRIA']).sum(axis=1)
+    
+    # Aplica o efeito de invisibilidade dos nomes repetidos
     pivot_df['CATEGORIA DE CUSTO'] = pivot_df['CATEGORIA DE CUSTO'].where(
-    pivot_df['CATEGORIA DE CUSTO'].ne(pivot_df['CATEGORIA DE CUSTO'].shift())) 
+    pivot_df['CATEGORIA DE CUSTO'].ne(pivot_df['CATEGORIA DE CUSTO'].shift()))
+    
     pivot_df = function_format_numeric_columns(pivot_df)
 
     return pivot_df
