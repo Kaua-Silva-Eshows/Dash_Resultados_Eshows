@@ -112,7 +112,7 @@ def function_formated_cost(df, merged_df):
             else:
                 merged_df[f'{col_code}%'] = (merged_df[col] / merged_df['Faturamento Total']) * 100
     # Calcula o resultado total (faturamento - custo total)
-    merged_df['Resultado Final'] = merged_df['Faturamento Total'] - merged_df['Custos Totais']
+    merged_df['Resultado Final'] = merged_df['Faturamento Total'] - merged_df['Custos Totais'] - merged_df['C10 Investimentos']
     # Adiciona a porcentagem de lucro
     merged_df['Res%'] = merged_df.apply(
         lambda row: (row['Resultado Final'] / row['Faturamento Total']) * 100 
