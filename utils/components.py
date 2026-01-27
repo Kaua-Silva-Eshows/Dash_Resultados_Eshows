@@ -96,6 +96,18 @@ def component_plotDataframe(df, name, num_columns=[], percent_columns=[], df_det
     gb = GridOptionsBuilder.from_dataframe(df)
     gb.configure_default_column(filter=True)
 
+    # Comparador para ordenação numérica no filtro
+    numeric_comparator = JsCode("""
+    function(a, b) {
+        const numA = parseInt(String(a).replace(/\D/g, '')) || 0;
+        const numB = parseInt(String(b).replace(/\D/g, '')) || 0;
+        if (numA !== 0 || numB !== 0) {
+            return numA - numB;
+        }
+        return String(a).localeCompare(String(b));
+    }
+    """)
+
     # Esconder colunas _NUM e detail
     for col in num_columns + percent_columns:
         if f"{col}_NUM" in df.columns:
@@ -148,6 +160,9 @@ def component_plotDataframe(df, name, num_columns=[], percent_columns=[], df_det
                 "minWidth": 100,
                 "autoHeight": False,
                 "filter": True,
+                "filterParams": {
+                    "comparator": numeric_comparator
+                }
             }
         })
 
@@ -162,6 +177,9 @@ def component_plotDataframe(df, name, num_columns=[], percent_columns=[], df_det
                 "minWidth": 100,
                 "autoHeight": False,
                 "filter": True,
+                "filterParams": {
+                    "comparator": numeric_comparator
+                }
             }
         })
 

@@ -14,7 +14,7 @@ SELECT
     SUM(CASE WHEN G1.ID IN ('233') THEN DR.VALOR_PAGAMENTO ELSE 0 END) AS 'C6 Despesas com Clientes',
     SUM(CASE WHEN G1.ID IN ('217') THEN DR.VALOR_PAGAMENTO ELSE 0 END) AS 'C7 Despesas com Softwares e Licenças',
     SUM(CASE WHEN G1.ID IN ('211', '224', '227') THEN DR.VALOR_PAGAMENTO ELSE 0 END) AS 'C8 Despesas com Marketing',
-    SUM(CASE WHEN G1.ID IN ('213', '229', '228', '212', '214', '219') THEN DR.VALOR_PAGAMENTO ELSE 0 END) AS 'C9 Despesas Financeiras',
+    SUM(CASE WHEN G1.ID IN ('213', '229', '228', '212', '214') THEN DR.VALOR_PAGAMENTO ELSE 0 END) AS 'C9 Despesas Financeiras',
 	SUM(CASE WHEN G1.ID IN ('219') THEN DR.VALOR_PAGAMENTO ELSE 0 END) AS 'C10 Investimentos',    
     SUM(DR.VALOR_PAGAMENTO) AS 'Custos Totais'
 FROM T_DESPESA_RAPIDA DR
@@ -94,7 +94,9 @@ SELECT
         WHEN G1.ID IN ('233') THEN 'c6_Despesas_com_Clientes'
         WHEN G1.ID IN ('217') THEN 'c7_Despesas_com_Softwares_e_Licencas'
         WHEN G1.ID IN ('211', '224', '227') THEN 'c8_Despesas_com_Marketing'
-        WHEN G1.ID IN ('213', '229', '228', '212', '214', '219') THEN 'c9_Despesas_Financeiras'
+        WHEN G1.ID IN ('213', '229', '228', '212', '214') THEN 'c9_Despesas_Financeiras'
+        WHEN G1.ID IN ('219') THEN 'c10_Investimentos'
+
     END AS `GRUPO GERAL`,
     G1.DESCRICAO AS 'NIVEL 1',
     G2.DESCRICAO AS 'NIVEL 2',

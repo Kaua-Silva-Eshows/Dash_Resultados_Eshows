@@ -100,10 +100,6 @@ FE.Taxa_Adiantamento AS 'ADIANTAMENTO',
 FE.SAAS_Percentual AS 'SAAS PERCENTUAL',
 FE.SAAS_Mensalidade AS 'SAAS MENSALIDADE',
 
-CASE WHEN FE.Fk_Sem_Curadoria = '0' THEN 'SEM'
-WHEN FE.Fk_Sem_Curadoria = '1' THEN 'COM'
-END 'CURADORIA',
-
 FE.Taxa_Emissao_NF AS 'TAXA EMISSÃO NF',
 FE.Valor_Total AS 'VALOR TOTAL',
 GC.NOME AS 'Grupo',
