@@ -1,0 +1,19 @@
+# Secrets — NUNCA commitar
+.streamlit/secrets.toml
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+.devcontainer/
+
+# Dados locais
+data/*.xlsx
+data/*.csv
