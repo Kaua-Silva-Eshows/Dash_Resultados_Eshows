@@ -44,7 +44,7 @@ def BuildManegementBilling(generalRevenue, groupsCompanies, generalRevenuePropos
         with cols[0]:
             groupsCompanies = groups_companies(day_ManegementBilling1, day_ManegementBilling2, filters)
 
-            selected_groups = st.multiselect("Selecione um grupo:", ['Outros'] + sorted(filter(None, groupsCompanies['NOME'].unique())), default=[], placeholder='Grupos')
+            selected_groups = st.multiselect("Selecione um grupo:", ['Outros'] + sorted(groupsCompanies['NOME'].dropna().unique().tolist()), default=[], placeholder='Grupos')
         if selected_groups:
             selected_groups.append(None)
             groupsCompanies_filtered = groupsCompanies[groupsCompanies['NOME'].isin(selected_groups)]
@@ -108,7 +108,7 @@ def BuildManegementBilling(generalRevenue, groupsCompanies, generalRevenuePropos
                 groupsCompanies = groups_companies(day_ManegementBilling1, day_ManegementBilling2, filters)
 
                 with cols[1]:
-                    selected_groups = st.multiselect("Selecione um grupo:", ['Outros'] + sorted(filter(None, groupsCompanies['NOME'].unique())), default=[], placeholder='Grupos', key='tab2_groups')
+                    selected_groups = st.multiselect("Selecione um grupo:", ['Outros'] + sorted(groupsCompanies['NOME'].dropna().unique().tolist()), default=[], placeholder='Grupos', key='tab2_groups')
 
                     if selected_groups:
                         selected_groups.append(None)
