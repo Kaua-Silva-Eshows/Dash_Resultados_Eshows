@@ -132,7 +132,7 @@ def component_plotDataframe(df, name, num_columns=[], percent_columns=[], df_det
         for col in df.columns:
             if col in [coluns_name_details, "detail"]:
                 continue
-            col_def = {"field": col}
+            col_def = {"field": col, "headerName": col}
             if col in num_columns + percent_columns:
                 col_def["cellStyle"] = cellstyle_code
             other_columns.append(col_def)
@@ -189,7 +189,8 @@ def component_plotDataframe(df, name, num_columns=[], percent_columns=[], df_det
 
     # Ajustar columnDefs se não for masterDetail
     if "masterDetail" not in grid_options:
-        grid_options["columnDefs"] = [{"field": col} for col in df_to_show.columns]
+        # headerName explícito: sem ele o AgGrid quebra camelCase no título ("SaaS" vira "Saa S")
+        grid_options["columnDefs"] = [{"field": col, "headerName": col} for col in df_to_show.columns]
     
     # Adicionar efeito zebra (linhas alternadas)
     if st.session_state.get("base_theme") == "dark":
