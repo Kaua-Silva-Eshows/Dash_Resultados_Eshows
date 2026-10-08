@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, time
 import streamlit as st
 import os
 import streamlit.components.v1 as components
+from data.querys_blueme import EXTRAORDINARY_REVENUE_MAP
 
 def function_copy_dataframe_as_tsv(df):
     # Converte o DataFrame para uma string TSV
@@ -102,6 +103,35 @@ def function_box_lenDf(len_df,df,y='', x='', box_id='', item=''):
         """,
         unsafe_allow_html=True
     )
+
+def function_merge_extraordinary_revenue_blueme(general_revenue_df, extraordinary_revenue_df=None):
+    """Soma as receitas extraordinárias da BlueMe (linhas de EXTRAORDINARY_REVENUE_MAP) ao
+    faturamento da plataforma e recalcula Faturamento Total. Sem extraordinary_revenue_df
+    (visão filtrada por comissão, grupo, KY ou casa, à qual essas receitas não pertencem), as
+    linhas entram zeradas. Take Rate e Percentual Faturamento seguem só sobre os shows."""
+    df = general_revenue_df.copy()
+    lines = list(EXTRAORDINARY_REVENUE_MAP)
+
+    if extraordinary_revenue_df is not None and not extraordinary_revenue_df.empty:
+        df = df.merge(extraordinary_revenue_df[['Mês/Ano'] + lines], on='Mês/Ano', how='outer')
+    for line in lines:
+        if line not in df.columns:
+            df[line] = 0
+
+    for col in df.columns:
+        if col != 'Mês/Ano':
+            df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
+
+    df['Faturamento Total'] = df.get('Faturamento Total', 0) + sum(df[line] for line in lines)
+
+    cols = [col for col in df.columns if col not in lines + ['Faturamento Total', 'Percentual Faturamento']]
+    df = df[cols + lines + [col for col in ['Faturamento Total', 'Percentual Faturamento'] if col in df.columns]]
+
+    if 'Mês/Ano' in df.columns:
+        df['__order__'] = pd.to_datetime('01/' + df['Mês/Ano'].astype(str), format='%d/%m/%Y', errors='coerce')
+        df = df.sort_values('__order__').drop(columns='__order__').reset_index(drop=True)
+
+    return df
 
 def function_formated_cost(df, merged_df):
     for col in df.columns:
