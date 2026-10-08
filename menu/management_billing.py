@@ -1,5 +1,6 @@
 import streamlit as st
 from data.querys_eshows import *
+from data.querys_blueme import *
 from menu.page import Page
 from utils.components import *
 from utils.functions import *
@@ -33,9 +34,18 @@ def BuildManegementBilling(generalRevenue, groupsCompanies, generalRevenuePropos
     row2 = st.columns(1)
     with row2[0]:
         generalRevenue = general_revenue(day_ManegementBilling1, day_ManegementBilling2, filters)    
-        generalRevenue = function_format_numeric_columns(generalRevenue, columns_num=['Valor Total', 'Comissão B2B', 'Comissão B2C', 'SAAS Mensalidade', 'SAAS Percentual', 'Curadoria', 'Taxa Adiantamento', 'Taxa Emissão NF', 'Faturamento Total'], columns_percent=['Take Rate','Percentual Faturamento'])
+        # Desenvolvimentos SaaS (BlueMe) não é receita de show: entra só na visão Geral, fora dos filtros de comissão
+        extraordinaryRevenueMonthly = extraordinary_revenue_monthly(day_ManegementBilling1, day_ManegementBilling2) if commision_type == "Geral" else None
+        generalRevenue = function_merge_extraordinary_revenue_blueme(generalRevenue, extraordinaryRevenueMonthly)
+        generalRevenue = function_format_numeric_columns(generalRevenue, columns_num=['Valor Total', 'Comissão B2B', 'Comissão B2C', 'SAAS Mensalidade', 'SAAS Percentual', 'Curadoria', 'Taxa Adiantamento', 'Taxa Emissão NF', 'Desenvolvimentos SaaS', 'Faturamento Total'], columns_percent=['Take Rate','Percentual Faturamento'])
         filtered_copy, count = component_plotDataframe(generalRevenue, "Faturamento Eshows Gerencial")
         function_copy_dataframe_as_tsv(filtered_copy)
+
+        with st.expander("📊 Abertura por Desenvolvimentos SaaS", expanded=False):
+            saasRevenueDetails = extraordinary_revenue_details(day_ManegementBilling1, day_ManegementBilling2, 'Desenvolvimentos SaaS')
+            saasRevenueDetails = function_format_numeric_columns(saasRevenueDetails, columns_num=['Valor'])
+            filtered_copy, count = component_plotDataframe(saasRevenueDetails, "Abertura por Desenvolvimentos SaaS")
+            function_copy_dataframe_as_tsv(filtered_copy)
 
     tabs = st.tabs(["Filtro por Grupo", "Filtro por KeyAccount"])
     with tabs[0]:
@@ -81,7 +91,8 @@ def BuildManegementBilling(generalRevenue, groupsCompanies, generalRevenuePropos
                     filters += f" AND C.NAME IN ({select_companies_str})"
 
             generalRevenue = general_revenue(day_ManegementBilling1, day_ManegementBilling2, filters)
-            generalRevenue = function_format_numeric_columns(generalRevenue, columns_num=['Valor Total', 'Comissão B2B', 'Comissão B2C', 'SAAS Mensalidade', 'SAAS Percentual', 'Curadoria', 'Taxa Adiantamento', 'Taxa Emissão NF', 'Faturamento Total'], columns_percent=['Take Rate','Percentual Faturamento'])
+            generalRevenue = function_merge_extraordinary_revenue_blueme(generalRevenue)
+            generalRevenue = function_format_numeric_columns(generalRevenue, columns_num=['Valor Total', 'Comissão B2B', 'Comissão B2C', 'SAAS Mensalidade', 'SAAS Percentual', 'Curadoria', 'Taxa Adiantamento', 'Taxa Emissão NF', 'Desenvolvimentos SaaS', 'Faturamento Total'], columns_percent=['Take Rate','Percentual Faturamento'])
             
             filtered_copy, count = component_plotDataframe(generalRevenue, "Faturamento Detalhado")
             function_copy_dataframe_as_tsv(filtered_copy)
@@ -135,7 +146,8 @@ def BuildManegementBilling(generalRevenue, groupsCompanies, generalRevenuePropos
                             filters += f" AND C.NAME IN ({select_companies_str})"
 
                 generalRevenue = general_revenue(day_ManegementBilling1, day_ManegementBilling2, filters)
-                generalRevenue = function_format_numeric_columns(generalRevenue, columns_num=['Valor Total', 'Comissão B2B', 'Comissão B2C', 'SAAS Mensalidade', 'SAAS Percentual', 'Curadoria', 'Taxa Adiantamento', 'Taxa Emissão NF', 'Faturamento Total'], columns_percent=['Take Rate','Percentual Faturamento'])
+                generalRevenue = function_merge_extraordinary_revenue_blueme(generalRevenue)
+                generalRevenue = function_format_numeric_columns(generalRevenue, columns_num=['Valor Total', 'Comissão B2B', 'Comissão B2C', 'SAAS Mensalidade', 'SAAS Percentual', 'Curadoria', 'Taxa Adiantamento', 'Taxa Emissão NF', 'Desenvolvimentos SaaS', 'Faturamento Total'], columns_percent=['Take Rate','Percentual Faturamento'])
                 
                 filtered_copy, count = component_plotDataframe(generalRevenue, "Faturamento Detalhado", key='tab2')
                 function_copy_dataframe_as_tsv(filtered_copy)

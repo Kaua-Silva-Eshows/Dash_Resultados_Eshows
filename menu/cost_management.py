@@ -23,6 +23,8 @@ def BuildCostManagement(generalRevenue, generalCosts, costDetails, ratingsRank, 
         day_CostManagement2 = st.date_input('Data Final:', value=date(datetime.today().year, datetime.today().month, calendar.monthrange(datetime.today().year, datetime.today().month)[1]), format='DD/MM/YYYY', key='day_CostManagement2')
 
     generalRevenue = general_revenue(day_CostManagement1, day_CostManagement2)
+    extraordinaryRevenueMonthly = extraordinary_revenue_monthly(day_CostManagement1, day_CostManagement2)
+    generalRevenue = function_merge_extraordinary_revenue_blueme(generalRevenue, extraordinaryRevenueMonthly)
     generalCosts = general_costs(day_CostManagement1, day_CostManagement2)
     generalCostsBlueme = general_costs_blueme(day_CostManagement1, day_CostManagement2)
     
@@ -161,7 +163,10 @@ class CostManagement():
         day_CostManagement1 = date(datetime.today().year - 1, 1, 1)
         day_CostManagement2 = date(datetime.today().year, 12, 31)
         data_ratingsRank = datetime.today().strftime('%Y-%m')
-        self.data['generalRevenue'] = general_revenue(day_CostManagement1, day_CostManagement2, filters='')
+        self.data['generalRevenue'] = function_merge_extraordinary_revenue_blueme(
+            general_revenue(day_CostManagement1, day_CostManagement2, filters=''),
+            extraordinary_revenue_monthly(day_CostManagement1, day_CostManagement2),
+        )
         self.data['generalCosts'] = general_costs(day_CostManagement1, day_CostManagement2)
         self.data['costDetails'] = cost_details(day_CostManagement1, day_CostManagement2)
         self.data['ratingsRank'] = ratings_rank(data_ratingsRank)
