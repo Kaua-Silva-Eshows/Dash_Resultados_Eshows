@@ -134,6 +134,10 @@ def function_merge_extraordinary_revenue_blueme(general_revenue_df, extraordinar
     return df
 
 def function_formated_cost(df, merged_df):
+    # Custos chegam do MySQL como Decimal e o faturamento (após somar as receitas
+    # extraordinárias) como float; Decimal / float dá TypeError, então tudo vira float aqui.
+    num_cols = [col for col in merged_df.columns if col != 'Mês/Ano']
+    merged_df[num_cols] = merged_df[num_cols].apply(pd.to_numeric, errors='coerce')
     for col in df.columns:
         if col not in ['Mês/Ano', 'Faturamento Total', 'Custos Totais']: 
             col_code = col.split()[0]
